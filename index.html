@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>The Hollow Hill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap">
+<style>
+:root{--bg:#0b0e1c;--ink:#f4efe4;--dim:#b4b0c8;--gold:#e8c26a;--glass:rgba(12,14,30,.74);--line:rgba(255,236,190,.26);
+  --serif:'Cinzel','Trebuchet MS',Georgia,serif;--body:'Cormorant Garamond',Georgia,'Times New Roman',serif;color-scheme:dark}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:19px;line-height:1.25;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+#app{position:relative;height:100%;width:100%}
+#cv{position:absolute;left:-16px;right:-16px;top:calc(-1*env(safe-area-inset-top,0px));bottom:calc(-1*env(safe-area-inset-bottom,0px));width:calc(100% + 32px);height:calc(100% + env(safe-area-inset-top,0px) + env(safe-area-inset-bottom,0px));display:block;touch-action:none}
+.glass{background:var(--glass);border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#hud{position:absolute;inset:0;pointer-events:none}
+#hud>*{pointer-events:auto}
+#bar{position:absolute;left:0;right:0;top:max(10px,env(safe-area-inset-top,0px));display:flex;align-items:center;gap:8px;pointer-events:none}
+#bar>*{pointer-events:auto}
+#loc{flex:1;text-align:center;font-family:var(--serif);font-size:13px;letter-spacing:.2em;text-transform:uppercase;text-shadow:0 1px 10px rgba(0,0,0,.8);pointer-events:none}
+.rb{min-width:42px;height:42px;padding:0 12px;border-radius:21px;font-size:18px;display:grid;place-items:center}
+.rb.off{opacity:.45}
+#bJ{font-family:var(--serif);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.pulse{animation:pl 1.2s ease-in-out infinite}
+@keyframes pl{50%{box-shadow:0 0 0 4px rgba(232,194,106,.5)}}
+#toast{position:absolute;left:50%;top:calc(max(10px,env(safe-area-inset-top,0px)) + 58px);transform:translate(-50%,-6px);padding:7px 16px;border-radius:99px;font-size:17px;background:rgba(12,14,30,.85);border:1px solid var(--line);opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;max-width:94%;overflow:hidden;text-overflow:ellipsis}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#dlg{position:absolute;left:0;right:0;top:calc(max(10px,env(safe-area-inset-top,0px)) + 56px);padding:12px 16px 12px;max-height:56%;overflow:auto;touch-action:pan-y}
+#dw{font-family:var(--serif);font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+#dt{font-size:20px;line-height:1.28;min-height:1.3em}
+#dc{display:grid;gap:8px;margin-top:10px}
+#dc button{text-align:left;padding:11px 14px;border-radius:12px;background:rgba(232,194,106,.12);border:1px solid rgba(232,194,106,.5);font-size:19px;line-height:1.2}
+#dc button:active{background:rgba(232,194,106,.3)}
+#dh{text-align:right;font-size:14px;color:var(--dim);font-style:italic;margin-top:6px}
+#inv{position:absolute;left:0;right:0;bottom:max(12px,env(safe-area-inset-bottom,0px));display:flex;gap:8px;justify-content:center;flex-wrap:wrap;pointer-events:none}
+#inv>*{pointer-events:auto}
+.it{width:54px;height:54px;border-radius:14px;font-size:28px;display:grid;place-items:center;background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.it.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(232,194,106,.5),0 0 18px rgba(232,194,106,.5);transform:translateY(-4px)}
+.it.lit{box-shadow:0 0 14px rgba(255,170,70,.7)}
+#sel{position:absolute;left:0;right:0;bottom:calc(max(12px,env(safe-area-inset-bottom,0px)) + 70px);padding:10px 14px}
+#selN{font-family:var(--serif);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+#selD{font-size:17px;margin:2px 0 8px;color:var(--ink)}
+#sel .row{display:flex;gap:8px}
+.sm{padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.08);font-size:16px}
+#pop{position:absolute;min-width:150px;padding:8px;z-index:5}
+#pop .pn{font-family:var(--serif);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:6px}
+#pop .pr{display:flex;gap:6px;justify-content:center}
+#pop button{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid var(--line);font-size:17px;white-space:nowrap}
+#fade{position:absolute;inset:-60px;background:#05060f;opacity:0;pointer-events:none;transition:opacity .9s ease-in-out;z-index:20}
+#dlg:not([hidden]),#sel:not([hidden]),#pop:not([hidden]),.ov:not([hidden])>.pan{animation:fl .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes fl{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.it,#dc button,.btn,.sm,#pop button,.rb{transition:transform .25s ease,box-shadow .35s ease,background .3s ease,border-color .3s ease}
+.glass{border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.28)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;padding:max(18px,env(safe-area-inset-top,0px)) 0 max(16px,env(safe-area-inset-bottom,0px));z-index:10}
+#title{background:linear-gradient(180deg,rgba(5,6,15,.55),rgba(5,6,15,.1) 40%,rgba(5,6,15,.8))}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(32px,10vw,56px);letter-spacing:.14em;margin:0;line-height:1.05;text-shadow:0 2px 24px rgba(0,0,0,.6);text-transform:uppercase}
+.tag{font-style:italic;font-size:21px;margin-top:8px;text-shadow:0 1px 10px rgba(0,0,0,.8)}
+.stack{margin-top:auto;display:grid;gap:10px}
+.how{padding:12px 14px;font-size:17px;color:var(--ink)}
+.how b{color:var(--gold);font-weight:700}
+.btn{display:block;width:100%;padding:14px 18px;border-radius:14px;background:var(--glass);border:1px solid var(--line);font-family:var(--serif);font-size:15px;letter-spacing:.14em;text-transform:uppercase;text-align:center}
+.btn.main{background:linear-gradient(180deg,#f3d27e,#c99a38);color:#2b1c05;border-color:#ffe9a8;font-weight:700}
+.btn:active{transform:translateY(2px)}
+.pan{margin:auto 0;max-height:100%;overflow:auto;padding:16px;touch-action:pan-y}
+.pan h2{font-family:var(--serif);font-size:20px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 4px}
+.pan h3{font-family:var(--serif);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:14px 0 4px}
+.pan p{margin:4px 0;font-size:19px}
+.lo{margin:6px 0;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06)}
+.lo b{display:block;font-family:var(--serif);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.lo span{font-size:17px}
+#whD{display:flex;gap:10px;justify-content:center;margin:12px 0}
+#whD i{width:46px;height:46px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-style:normal;font-family:var(--serif);font-size:20px}
+#whD i.on{border-color:var(--gold);background:rgba(232,194,106,.25)}
+#whD.no i{border-color:#e0383c;animation:sh .3s}
+@keyframes sh{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+#whB{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+#whB button{height:74px;border-radius:14px;background:rgba(232,194,106,.14);border:1px solid rgba(232,194,106,.55);font-family:var(--serif);font-size:24px}
+#whB button:active{background:rgba(232,194,106,.4)}
+#whK{display:grid;gap:2px;font-size:17px;color:var(--dim);text-align:center}
+#endB p{font-size:19px;margin:8px 0}
+@media (max-height:520px){#dt{font-size:17px}#dw{font-size:11px}#dc button{font-size:16px;padding:7px 12px}#dlg{padding:8px 14px}#toast{font-size:15px}.it{width:44px;height:44px;font-size:22px}}
+</style>
+<div id="app">
+  <canvas id="cv" role="img" aria-label="A moonlit Celtic landscape"></canvas>
+  <div id="hud" hidden>
+    <div id="bar"><button type="button" class="glass rb" id="bJ">Journal</button><div id="loc"></div><button type="button" class="glass rb" id="bH" aria-label="Toggle hints">&#10024;</button><button type="button" class="glass rb" id="bS" aria-label="Sound">&#128266;</button></div>
+    <div id="toast" role="status"></div>
+    <div id="dlg" class="glass" hidden><div id="dw"></div><div id="dt"></div><div id="dc"></div><div id="dh">tap to continue</div></div>
+    <div id="sel" class="glass" hidden><div id="selN"></div><div id="selD"></div><div class="row"><button type="button" class="sm" id="selP" hidden>Play</button><button type="button" class="sm" id="selX">Put away</button></div></div>
+    <div id="inv" class="empty"></div>
+    <div id="pop" class="glass" hidden></div>
+  </div>
+  <section id="title" class="ov">
+    <div><h1>The Hollow<br>Hill</h1><div class="tag">A Samhain tale of geasa, bargains and the Folk beneath the hill.</div></div>
+    <div class="stack">
+      <div class="how glass"><b>Tap</b> the world to walk. <b>Tap glowing things</b> to look or act. <b>Tap an item</b>, then what to use it on. Built on real Celtic lore: geasa, guest-right, ogham, the three strains of the harp. Mind your manners.</div>
+      <button type="button" class="btn main" id="bNew">Begin the night</button>
+      <button type="button" class="btn" id="bCont" hidden>Continue</button>
+    </div>
+  </section>
+  <section id="jr" class="ov" hidden><div class="pan glass"><h2>Journal</h2><div id="jrB"></div><button type="button" class="btn" id="jrX" style="margin-top:14px">Close</button></div></section>
+  <section id="wh" class="ov" hidden><div class="pan glass"><h2 id="whT">Tin whistle</h2><div id="whK"></div><div id="whD"></div><div id="whB"><button data-n="1">1</button><button data-n="2">2</button><button data-n="3">3</button><button data-n="4">4</button><button data-n="5">5</button></div><button type="button" class="btn" id="whX" style="margin-top:14px">Lower the whistle</button></div></section>
+  <section id="end" class="ov" hidden><div class="pan glass"><div id="endK" style="font-family:var(--serif);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)"></div><h2 id="endT"></h2><div id="endB"></div><button type="button" class="btn main" id="endR" hidden style="margin-top:10px">Rewind to before</button><button type="button" class="btn" id="endN" style="margin-top:10px">Start again</button></div></section>
+  <div id="fade"></div>
+</div>
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),TAU=Math.PI*2,rr=Math.random,sgn=v=>v>0?1:v<0?-1:0;
+function mulb(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hexA(h,a){const n=parseInt(h.slice(1),16);return 'rgba('+(n>>16&255)+','+(n>>8&255)+','+(n&255)+','+a+')'}
+function shade(h,k){const n=parseInt(h.slice(1),16),f=v=>Math.round(clamp(k>=0?v+(255-v)*k:v*(1+k),0,255));return 'rgb('+f(n>>16&255)+','+f(n>>8&255)+','+f(n&255)+')'}
+function mixH(a,b,t){const A=parseInt(a.slice(1),16),B=parseInt(b.slice(1),16),f=s=>Math.round((A>>s&255)*(1-t)+(B>>s&255)*t);return '#'+((1<<24)+(f(16)<<16)+(f(8)<<8)+f(0)).toString(16).slice(1)}
+
+/* ---------- painting helpers (logical scene units, 600 tall) ---------- */
+function sky(g,w,h,stops){const gr=g.createLinearGradient(0,0,0,h);stops.forEach((c,i)=>gr.addColorStop(i/(stops.length-1),c));g.fillStyle=gr;g.fillRect(0,0,w,h)}
+function glow(g,x,y,r,col,gc,k){const gg=g.createRadialGradient(x,y,r*.4,x,y,r*k);gg.addColorStop(0,hexA(gc,.65));gg.addColorStop(1,hexA(gc,0));g.fillStyle=gg;g.beginPath();g.arc(x,y,r*k,0,TAU);g.fill();if(col){g.fillStyle=col;g.beginPath();g.arc(x,y,r,0,TAU);g.fill()}}
+function ridge(g,w,y0,amp,col,seed,fq,bot){g.fillStyle=col;g.beginPath();g.moveTo(0,bot||600);for(let x=0;x<=w+8;x+=8)g.lineTo(x,y0+Math.sin(x*fq+seed)*amp+Math.sin(x*fq*2.3+seed*2)*amp*.45+Math.sin(x*fq*5.1+seed*3)*amp*.15);g.lineTo(w,bot||600);g.closePath();g.fill()}
+function stars(g,w,h,n,seed){const R=mulb(seed);for(let i=0;i<n;i++){g.fillStyle='rgba(255,255,255,'+(.25+R()*.7)+')';const s=R()<.08?2.2:1.2;g.fillRect(R()*w,R()*h,s,s)}}
+function cloudBand(g,x,y,w,h,col){const gg=g.createLinearGradient(0,y-h,0,y+h);gg.addColorStop(0,hexA(col,0));gg.addColorStop(.5,hexA(col,.5));gg.addColorStop(1,hexA(col,0));g.fillStyle=gg;g.fillRect(x,y-h,w,h*2)}
+function rr_(g,x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r)}
+function tree(g,x,y,s,trunk,leaf,seed,glowc){const R=mulb(seed);g.strokeStyle=trunk;g.lineCap='round';const br=(x,y,a,l,wd,d)=>{if(d<0)return;const x2=x+Math.cos(a)*l,y2=y+Math.sin(a)*l;g.lineWidth=wd;g.beginPath();g.moveTo(x,y);g.lineTo(x2,y2);g.stroke();if(d<2){for(let i=0;i<4;i++){g.fillStyle=hexA(leaf,.55+R()*.35);g.beginPath();g.arc(x2+(R()-.5)*s*.2,y2+(R()-.5)*s*.18,s*(.07+R()*.06),0,TAU);g.fill()}}br(x2,y2,a-.45-R()*.25,l*.74,wd*.66,d-1);br(x2,y2,a+.4+R()*.25,l*.72,wd*.66,d-1)};br(x,y,-Math.PI/2+(R()-.5)*.2,s*.34,s*.075,4);if(glowc)glow(g,x,y-s*.55,s*.3,null,glowc,1.6)}
+function roundhouse(g,x,y,w,h,o){o=o||{};const wh=h*.62,wallC=o.wall||'#b58e6a',thC=o.thatch||'#a0803c';
+ const wg=g.createLinearGradient(x-w/2,0,x+w/2,0);wg.addColorStop(0,shade(wallC,.12));wg.addColorStop(.6,wallC);wg.addColorStop(1,shade(wallC,-.35));g.fillStyle=wg;g.fillRect(x-w/2,y-wh,w,wh);
+ g.fillStyle='rgba(60,36,20,.18)';for(let i=0;i<7;i++)g.fillRect(x-w/2,y-wh+i*(wh/7),w,2);
+ const rg=g.createLinearGradient(x-w/2,0,x+w/2,0);rg.addColorStop(0,shade(thC,.1));rg.addColorStop(.6,thC);rg.addColorStop(1,shade(thC,-.4));g.fillStyle=rg;g.beginPath();g.moveTo(x-w/2-16,y-wh+6);g.quadraticCurveTo(x-w*.2,y-wh-h*.55,x,y-wh-h*.78);g.quadraticCurveTo(x+w*.2,y-wh-h*.55,x+w/2+16,y-wh+6);g.quadraticCurveTo(x,y-wh+20,x-w/2-16,y-wh+6);g.fill();
+ g.strokeStyle='rgba(50,34,12,.35)';g.lineWidth=1.4;for(let i=-6;i<=6;i++){g.beginPath();g.moveTo(x,y-wh-h*.78);g.lineTo(x+i*(w/12+3),y-wh+12);g.stroke()}
+ g.fillStyle=shade(thC,-.5);g.fillRect(x-4,y-wh-h*.78-10,8,12);
+ // door + window
+ g.fillStyle='#2a1810';g.beginPath();g.roundRect(x-w*.12,y-wh*.78,w*.24,wh*.78,[w*.12,w*.12,0,0]);g.fill();g.fillStyle='#6a4428';g.fillRect(x-w*.12-3,y-wh*.78,3,wh*.78);g.fillRect(x+w*.12,y-wh*.78,3,wh*.78);
+ if(o.win!==false){g.fillStyle=o.winCol||'#ffb85a';g.shadowColor='#ffb85a';g.shadowBlur=14;rr_(g,x+w*.26,y-wh*.62,w*.14,wh*.3,3);g.fill();g.shadowBlur=0}}
+function standingStone(g,x,y,h,w,col,spiral,gc){g.fillStyle=col;g.beginPath();g.moveTo(x-w/2,y);g.quadraticCurveTo(x-w*.62,y-h*.6,x-w*.28,y-h);g.quadraticCurveTo(x+w*.1,y-h*1.04,x+w*.46,y-h*.9);g.quadraticCurveTo(x+w*.6,y-h*.4,x+w/2,y);g.closePath();g.fill();g.fillStyle='rgba(255,255,255,.1)';g.fillRect(x-w*.3,y-h*.8,w*.14,h*.7);g.fillStyle='rgba(20,30,20,.28)';g.beginPath();g.ellipse(x,y-4,w*.5,5,0,0,TAU);g.fill()}
+function spiral3(g,x,y,r,col,lw){g.strokeStyle=col;g.lineWidth=lw;g.lineCap='round';for(let k=0;k<3;k++){g.beginPath();for(let i=0;i<=40;i++){const a=k*TAU/3+i*.17,rad=r*i/40;const px=x+Math.cos(a)*rad,py=y+Math.sin(a)*rad;i?g.lineTo(px,py):g.moveTo(px,py)}g.stroke()}}
+function ogham(g,x,y,n,h,col,lw){g.strokeStyle=col;g.lineWidth=lw;g.lineCap='round';g.beginPath();g.moveTo(x,y);g.lineTo(x,y-h);g.stroke();for(let i=0;i<n;i++){const yy=y-h*.2-i*h*.18;g.beginPath();g.moveTo(x,yy);g.lineTo(x+h*.16,yy-h*.03);g.stroke()}}
+
+/* ---------- people ---------- */
+function person(g,o){const h=o.h||1,w=o.walk?Math.sin(o.t*10):0,bob=o.walk?-Math.abs(Math.sin(o.t*10))*1.8:Math.sin(o.t*1.6)*.5;
+ g.save();g.translate(o.x,o.y);g.scale((o.face||1)*o.s,o.s);
+ g.fillStyle='rgba(8,6,20,.32)';g.beginPath();g.ellipse(0,1,15*h,4.5,0,0,TAU);g.fill();
+ g.scale(1,1);g.translate(0,bob);const OUT='rgba(20,12,30,.7)',sk=o.skin||'#f0cfb0';
+ const Y=v=>v*h; 
+ if(o.robe!=='long'){[[-1,w],[1,-w]].forEach(([s,sw])=>{g.strokeStyle=OUT;g.lineCap='round';g.lineWidth=5.6;g.beginPath();g.moveTo(s*3.5,Y(-36));g.lineTo(s*3.5+sw*8,Y(-5));g.stroke();g.strokeStyle=o.legs||'#4a3a30';g.lineWidth=4;g.stroke();g.fillStyle=o.boot||'#2a1c14';g.beginPath();g.ellipse(s*3.5+sw*8+2,Y(-3),5,2.8,0,0,TAU);g.fill()})}
+ if(o.back)o.back(g);
+ g.strokeStyle=OUT;g.lineCap='round';g.lineWidth=5;g.beginPath();g.moveTo(-7,Y(-70));g.lineTo(-8+w*8,Y(-46));g.stroke();g.strokeStyle=o.sleeve||o.dress;g.lineWidth=3.4;g.stroke();g.fillStyle=sk;g.beginPath();g.arc(-8+w*8,Y(-45),2.6,0,TAU);g.fill();
+ const bottom=o.robe==='long'?-3:-36,flare=o.robe==='long'?(o.flare||15):11;const dg=g.createLinearGradient(0,Y(-72),0,Y(bottom));dg.addColorStop(0,shade(o.dress,.15));dg.addColorStop(1,shade(o.dress,-.3));
+ g.fillStyle=dg;g.beginPath();g.moveTo(-8.5,Y(-72));g.quadraticCurveTo(-10,Y(-52),-flare,Y(bottom));g.lineTo(flare,Y(bottom));g.quadraticCurveTo(10,Y(-52),8.5,Y(-72));g.quadraticCurveTo(0,Y(-76),-8.5,Y(-72));g.fill();g.strokeStyle=OUT;g.lineWidth=1.1;g.stroke();
+ if(o.trim){g.strokeStyle=o.trim;g.lineWidth=2;g.beginPath();g.moveTo(-flare,Y(bottom)-1);g.lineTo(flare,Y(bottom)-1);g.stroke()}
+ if(o.belt){g.fillStyle=o.belt;g.fillRect(-9,Y(-47),18,3)}
+ if(o.cloak){const cg=g.createLinearGradient(0,Y(-74),0,Y(-8));cg.addColorStop(0,o.cloak);cg.addColorStop(1,shade(o.cloak,-.35));g.fillStyle=cg;g.beginPath();g.moveTo(-8,Y(-72));g.quadraticCurveTo(-18,Y(-40),-16+w*-1.5,Y(-9));g.lineTo(-4,Y(-12));g.quadraticCurveTo(-5,Y(-48),-3,Y(-72));g.closePath();g.fill();g.strokeStyle=OUT;g.stroke()}
+ if(o.mid)o.mid(g);
+ g.fillStyle=sk;g.strokeStyle=OUT;g.lineWidth=1.1;g.beginPath();g.ellipse(0,Y(-85),8.4,9.2,0,0,TAU);g.fill();g.stroke();
+ if(o.hairBack)o.hairBack(g,Y);
+ g.fillStyle=o.hair||'#6a3a1a';if(o.hairStyle!=='bald'){g.beginPath();g.ellipse(-1,Y(-89),9,7,0,Math.PI,TAU);g.fill();g.stroke()}
+ if(!o.hideFace){g.fillStyle='#1d1626';g.beginPath();g.ellipse(4,Y(-86),1.25,1.7,0,0,TAU);g.fill();g.fillStyle='rgba(255,120,120,.35)';g.beginPath();g.ellipse(4.6,Y(-81.5),2.2,1.2,0,0,TAU);g.fill()}
+ if(o.hat)o.hat(g,Y);
+ g.strokeStyle=OUT;g.lineWidth=5;g.beginPath();g.moveTo(7,Y(-70));g.lineTo(8+(o.armF!==undefined?o.armF:-w*8),Y(o.armY||-46));g.stroke();g.strokeStyle=o.sleeve||o.dress;g.lineWidth=3.4;g.stroke();g.fillStyle=sk;g.beginPath();g.arc(8+(o.armF!==undefined?o.armF:-w*8),Y(o.armY||-45),2.6,0,TAU);g.fill();
+ if(o.front)o.front(g,Y);
+ g.restore()}
+const PEOPLE={
+ orla:{dress:'#3f7a70',cloak:'#6a3f7a',trim:'#e8c26a',belt:'#e8c26a',skin:'#f0cfb0',hair:'#9a3f1a',robe:'short',legs:'#3a2a38',
+  hairBack:(g,Y)=>{g.strokeStyle='#9a3f1a';g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(-6,Y(-88));g.quadraticCurveTo(-14,Y(-70),-9,Y(-56));g.stroke();g.fillStyle='#e8c26a';g.fillRect(-11,Y(-60),4,2.4)},
+  back:(g)=>{g.fillStyle='#7a5230';g.fillRect(-12,-62,6,16)}},
+ nan:{dress:'#6a4a62',skin:'#e6c4a4',hair:'#f0f0f4',robe:'long',flare:16,trim:'#c9a26a',
+  mid:(g)=>{g.fillStyle='#8a5a3a';g.beginPath();g.moveTo(-9,-72);g.quadraticCurveTo(0,-60,9,-72);g.lineTo(11,-46);g.quadraticCurveTo(0,-40,-11,-46);g.closePath();g.fill()},
+  hat:(g,Y)=>{g.fillStyle='#f0f0f4';g.beginPath();g.arc(-4,Y(-95),5,0,TAU);g.fill()},
+  front:(g)=>{g.strokeStyle='#5a3a22';g.lineWidth=2.6;g.lineCap='round';g.beginPath();g.moveTo(14,-8);g.lineTo(14,-96);g.stroke();g.beginPath();g.arc(15,-98,3.2,0,TAU);g.stroke()},armF:10,armY:-50},
+ dara:{h:.84,dress:'#6e8a4a',skin:'#f0c8a0',hair:'#c0602a',robe:'short',legs:'#3a3a4a',belt:'#8a5a2a',
+  hat:(g,Y)=>{g.fillStyle='#38486a';g.beginPath();g.ellipse(0,Y(-93),10,4,0,0,TAU);g.fill();g.beginPath();g.arc(0,Y(-93),8.5,Math.PI,TAU);g.fill();g.fillRect(2,Y(-94),12,3)}},
+ fiach:{h:1.18,dress:'#1c2c3c',skin:'#7a8a9a',hair:'#1c2c3c',robe:'long',flare:13,hideFace:true,trim:'#4a6a8a',
+  mid:(g)=>{g.fillStyle='#14202c';g.beginPath();g.moveTo(-9,-72);g.quadraticCurveTo(-13,-96,0,-103);g.quadraticCurveTo(13,-96,9,-72);g.closePath();g.fill()},
+  hat:(g,Y)=>{g.fillStyle='#14202c';g.beginPath();g.ellipse(-.5,Y(-86),11,12,0,Math.PI*.9,Math.PI*2.1);g.fill();g.fillStyle='#bfe8ff';g.shadowColor='#bfe8ff';g.shadowBlur=8;g.beginPath();g.arc(3,Y(-86),1.2,0,TAU);g.arc(7,Y(-86),1.2,0,TAU);g.fill();g.shadowBlur=0}},
+ lady:{h:1.24,dress:'#58e8d0',skin:'#e8f4f0',hair:'#cfeee8',robe:'long',flare:24,trim:'#f4e27a',hideFace:false,
+  hairBack:(g,Y)=>{const gr=g.createLinearGradient(0,Y(-95),0,Y(-20));gr.addColorStop(0,'#cfeee8');gr.addColorStop(1,'rgba(207,238,232,0)');g.fillStyle=gr;g.beginPath();g.moveTo(-8,Y(-92));g.quadraticCurveTo(-24,Y(-60),-14,Y(-18));g.lineTo(2,Y(-40));g.closePath();g.fill()},
+  hat:(g,Y)=>{g.strokeStyle='#f4e27a';g.lineWidth=2.4;g.lineCap='round';[-1,1].forEach(s=>{g.beginPath();g.moveTo(s*3,Y(-93));g.quadraticCurveTo(s*10,Y(-102),s*7,Y(-116));g.moveTo(s*7.6,Y(-106));g.lineTo(s*14,Y(-110));g.moveTo(s*8.6,Y(-112));g.lineTo(s*5,Y(-122));g.stroke()})},
+  mid:(g)=>{g.fillStyle='rgba(165,139,255,.55)';g.beginPath();g.moveTo(-6,-70);g.quadraticCurveTo(-30,-30,-40,-3);g.lineTo(-8,-3);g.closePath();g.fill()}},
+ guard:{h:1.26,dress:'#3a5a4c',skin:'#9ab8a8',hair:'#2a3a30',robe:'long',flare:14,trim:'#c9a26a',hideFace:true,
+  hat:(g,Y)=>{g.fillStyle='#4a6a5a';g.beginPath();g.ellipse(0,Y(-87),9.4,10,0,Math.PI,TAU);g.lineTo(9,Y(-80));g.lineTo(-9,Y(-80));g.fill();g.strokeStyle='#d8c890';g.lineWidth=2.6;g.lineCap='round';[-1,1].forEach(s=>{g.beginPath();g.moveTo(s*4,Y(-95));g.quadraticCurveTo(s*12,Y(-104),s*9,Y(-122));g.moveTo(s*10,Y(-110));g.lineTo(s*17,Y(-114));g.moveTo(s*10.6,Y(-116));g.lineTo(s*7,Y(-127));g.stroke()});g.fillStyle='#ffd27a';g.fillRect(2,Y(-86),5,1.8)},
+  front:(g)=>{g.strokeStyle='#5a4a30';g.lineWidth=2.6;g.beginPath();g.moveTo(17,-4);g.lineTo(17,-140);g.stroke();g.fillStyle='#d8e8f0';g.beginPath();g.moveTo(17,-158);g.lineTo(21,-140);g.lineTo(13,-140);g.fill()},armF:12,armY:-52}
+};
+function drawPerson(g,id,x,y,t,face,walk,extra){const b=PEOPLE[id],sc=extra&&extra.s||1;person(g,Object.assign({x,y,t,face,walk,s:sc},b,extra||{}))}
+function hound(g,x,y,t,face,moving,sit){g.save();g.translate(x,y);g.scale(face*.9,.9);g.fillStyle='rgba(8,6,20,.3)';g.beginPath();g.ellipse(0,1,22,4,0,0,TAU);g.fill();
+ const w=moving?Math.sin(t*14):0,c='#8a8f9a',d='#5c606c';
+ if(sit){g.fillStyle=c;g.beginPath();g.ellipse(-4,-16,14,17,-.3,0,TAU);g.fill();g.beginPath();g.ellipse(10,-34,9,8,0,0,TAU);g.fill();g.beginPath();g.moveTo(14,-34);g.lineTo(26,-30);g.lineTo(15,-27);g.fill();g.fillStyle=d;g.beginPath();g.moveTo(5,-40);g.lineTo(2,-52);g.lineTo(11,-42);g.fill();g.fillStyle='#14101c';g.beginPath();g.arc(12,-36,1.5,0,TAU);g.arc(25,-30,1.6,0,TAU);g.fill();g.strokeStyle=c;g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(-16,-4);g.quadraticCurveTo(-26,-6+Math.sin(t*5)*3,-28,-12);g.stroke()}
+ else{[-12,-6,10,16].forEach((lx,i)=>{g.strokeStyle=i%2?d:c;g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(lx,-16);g.lineTo(lx+(i%2?w:-w)*5,-1);g.stroke()});g.fillStyle=c;g.beginPath();g.ellipse(2,-22,19,9,0,0,TAU);g.fill();g.beginPath();g.ellipse(21,-30,8,7,0,0,TAU);g.fill();g.beginPath();g.moveTo(26,-31);g.lineTo(36,-27);g.lineTo(26,-24);g.fill();g.fillStyle=d;g.beginPath();g.moveTo(17,-35);g.lineTo(14,-45);g.lineTo(22,-36);g.fill();g.fillStyle='#14101c';g.beginPath();g.arc(23,-32,1.4,0,TAU);g.arc(35,-27,1.6,0,TAU);g.fill();g.strokeStyle=c;g.lineWidth=4;g.beginPath();g.moveTo(-16,-24);g.quadraticCurveTo(-26,-30+Math.sin(t*9)*4,-26,-18);g.stroke()}
+ g.restore()}
+function puca(g,x,y,t,glowing){g.save();g.translate(x,y);const bob=Math.sin(t*1.8)*1.2;g.translate(0,bob);g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(0,0,28,6,0,0,TAU);g.fill();
+ g.fillStyle='#17131f';g.beginPath();g.ellipse(-2,-26,24,26,-.1,0,TAU);g.fill();g.beginPath();g.ellipse(16,-56,13,13,0,0,TAU);g.fill();[-1,1].forEach(s=>{g.beginPath();g.ellipse(14+s*7,-86+(s>0?4:0),4.6,18,s*.25+.1,0,TAU);g.fill()});g.fillStyle='#17131f';g.beginPath();g.ellipse(-26,-16,8,7,0,0,TAU);g.fill();
+ g.fillStyle='#2a2438';g.beginPath();g.ellipse(2,-28,10,12,0,0,TAU);g.fill();g.fillStyle='#ffd23f';g.shadowColor='#ffd23f';g.shadowBlur=glowing?14:6;g.beginPath();g.ellipse(21,-58,2.6,3.4,0,0,TAU);g.fill();g.shadowBlur=0;g.fillStyle='#17131f';g.fillRect(6,-6,14,6);g.restore()}
+
+/* ---------- scenes ---------- */
+const VAR={dawn:false};
+const SC={};
+SC.village={w:1300,y0:505,y1:568,name:'Dunmara',root:196,
+ back(g,w,h){const d=VAR.dawn;sky(g,w,h,d?['#34467a','#b87aa0','#f6b8a0','#ffe2b0']:['#150f38','#4a2462','#b8506a','#f2a066']);
+  if(!d){stars(g,w,300,90,4);glow(g,940,150,44,'#fff1dc','#ffd9b0',3.4);ctxCrater(g,940,150)}else{glow(g,640,372,50,'#fff4c8','#ffe2a0',5)}
+  ridge(g,w,338,26,d?'#7a6a96':'#4c3572',3,.008,h);ridge(g,w,372,22,d?'#5a4d7c':'#33264f',8,.011,h);
+  for(let i=0;i<22;i++){const x=i*62+20,y=372+Math.sin(x*.011+8)*22;tree(g,x,y+8,36+i%3*8,d?'#3a3058':'#241a3c',d?'#4a4070':'#2e2150',i+4)}
+  const sx=1010,sy=368;[0,1,2,3,4,5,6].forEach(i=>{const a=i/7*TAU;standingStone(g,sx+Math.cos(a)*34,sy+Math.sin(a)*6,16,6,d?'#4a4268':'#2c2146')});
+  cloudBand(g,0,392,w,22,d?'#ffd2c0':'#d89080')},
+ main(g,w,h){const d=VAR.dawn;
+  const gg=g.createLinearGradient(0,396,0,h);gg.addColorStop(0,d?'#4a6a54':'#34523e');gg.addColorStop(1,d?'#233a30':'#14261f');ridge(g,w,402,5,'#3a5a44',1,.02,h);g.fillStyle=gg;g.fillRect(0,408,w,h);
+  for(let i=0;i<260;i++){const R=mulb(i+9);const x=R()*w,y=410+R()*190;g.strokeStyle=hexA(R()<.5?'#6a9a5a':'#1c3a2a',.35);g.lineWidth=1;g.beginPath();g.moveTo(x,y);g.lineTo(x+(R()-.5)*4,y-4-R()*6);g.stroke()}
+  g.fillStyle='#7a5a44';g.beginPath();g.moveTo(0,590);g.bezierCurveTo(300,540,600,560,860,525);g.bezierCurveTo(1060,500,1200,500,1300,520);g.lineTo(1300,560);g.bezierCurveTo(1180,540,1060,548,860,575);g.bezierCurveTo(620,600,300,590,0,600);g.closePath();g.fill();
+  g.fillStyle='rgba(255,230,190,.12)';g.fillRect(0,540,w,3);
+  roundhouse(g,640,452,118,92,{wall:'#9a7c64',thatch:'#86703a',win:false});
+  roundhouse(g,300,490,200,128,{wall:d?'#c49a76':'#b88e68',thatch:'#a98a3a'});
+  roundhouse(g,990,494,160,104,{wall:d?'#c09878':'#b58c68',thatch:'#9c7e38'});
+  // ogham doorpost + horseshoe at Nan's door
+  g.fillStyle='#6a4a30';g.fillRect(366,404,10,86);g.fillStyle='#3a2616';g.fillRect(369,404,2,86);
+  ogham(g,373,478,1,18,'#e8d8b0',1.3);ogham(g,373,458,2,18,'#e8d8b0',1.3);ogham(g,373,438,3,18,'#e8d8b0',1.3);ogham(g,373,418,4,18,'#e8d8b0',1.3);
+  g.strokeStyle='#9aa0aa';g.lineWidth=3.4;g.lineCap='round';g.beginPath();g.arc(300,400,10,.25*Math.PI,.75*Math.PI,true);g.stroke();g.beginPath();g.arc(300,396,11,Math.PI*.2,Math.PI*.8,false);g.stroke();
+  // rowan tree
+  g.strokeStyle='#4a3424';g.lineCap='round';g.lineWidth=12;g.beginPath();g.moveTo(98,520);g.quadraticCurveTo(92,470,100,430);g.stroke();
+  [[100,400,60],[62,430,40],[142,426,44],[104,372,38]].forEach(([x,y,r],i)=>{const cg=g.createRadialGradient(x-r*.2,y-r*.3,2,x,y,r);cg.addColorStop(0,i%2?'#6a9a4a':'#5a8a44');cg.addColorStop(1,'#2e5a34');g.fillStyle=cg;g.beginPath();g.arc(x,y,r,0,TAU);g.fill()});
+  for(let i=0;i<46;i++){const R=mulb(i+77),a=R()*TAU,r=R()*62;g.fillStyle='#e0383c';g.beginPath();g.arc(100+Math.cos(a)*r,405+Math.sin(a)*r*.7,2.6,0,TAU);g.fill()}
+  // hearth ring (unlit stones + logs)
+  g.fillStyle='#14100e';g.beginPath();g.ellipse(640,532,64,16,0,0,TAU);g.fill();
+  for(let i=0;i<16;i++){const a=i/16*TAU;g.fillStyle=i%2?'#7a7a86':'#6a6a76';g.beginPath();g.ellipse(640+Math.cos(a)*66,532+Math.sin(a)*17,9,6,0,0,TAU);g.fill()}
+  g.strokeStyle='#3a2a1c';g.lineWidth=7;g.lineCap='round';[[-30,-12,26,-8],[-28,6,28,2],[-12,-18,10,14]].forEach(l=>{g.beginPath();g.moveTo(640+l[0],526+l[1]);g.lineTo(640+l[2],526+l[3]);g.stroke()});
+  // flint stones by hearth
+  [[556,548,9],[571,552,7],[546,553,6]].forEach(([x,y,r])=>{g.fillStyle='#8a8a98';g.beginPath();g.ellipse(x,y,r*1.2,r*.8,0,0,TAU);g.fill();g.fillStyle='rgba(255,255,255,.3)';g.beginPath();g.ellipse(x-2,y-2,r*.4,r*.25,0,0,TAU);g.fill()});
+  // candle on sill near Nan's door
+  g.fillStyle='#e8dcc0';g.fillRect(230,430,6,13);g.fillStyle='#6a4a30';g.fillRect(222,443,22,4);
+  // fence + turnip lanterns near Dara
+  g.fillStyle='#5a4028';for(let i=0;i<9;i++){g.fillRect(820+i*28,498,5,36)}g.fillRect(820,508,230,4);
+  [[848,492],[904,492],[1070,516]].forEach(([x,y],i)=>{g.fillStyle=i===0?'#d8d4b8':'#cfc8a8';g.beginPath();g.ellipse(x,y,12,10,0,0,TAU);g.fill();g.fillStyle='#14101c';g.beginPath();g.arc(x-4,y-2,1.8,0,TAU);g.arc(x+4,y-2,1.8,0,TAU);g.fill();g.fillRect(x-4,y+3,8,1.6)});
+  standingStone(g,1236,536,150,44,'#6c6a80');spiral3(g,1236,484,13,'rgba(220,230,255,.55)',2);
+  [[760,540],[782,548]].forEach(([x,y])=>{g.fillStyle='#b8984a';g.beginPath();g.ellipse(x,y,22,16,0,Math.PI,TAU);g.fill()})},
+ dyn(g,t,cam,S){const lit=S.f.hearth;
+  [[300,380],[990,400],[640,388]].forEach(([x,y],i)=>{for(let k=0;k<4;k++){const p=((t*.12+k/4+i*.3)%1);g.fillStyle='rgba(200,190,210,'+(.2*(1-p))+')';g.beginPath();g.arc(x+Math.sin(p*5+k)*14+p*30,y-p*130,6+p*18,0,TAU);g.fill()}});
+  if(lit){fire(g,640,530,t,1.5)}
+  for(let i=0;i<22;i++){const R=mulb(i+5),x=(R()*1300+t*(10+R()*16))%1300,y=300+R()*260-(t*(6+R()*8)%60);g.fillStyle=hexA(VAR.dawn?'#ffe2b0':'#ffb85a',.5);g.beginPath();g.arc(x,y,1.4+R(),0,TAU);g.fill()}
+  for(let i=0;i<7;i++){const R=mulb(i+99),x=(R()*1300+t*(40+R()*30))%1300,y=480+R()*80+Math.sin(t*2+i)*10;g.save();g.translate(x,y);g.rotate(t*2+i);g.fillStyle=i%2?'#c8742a':'#a8501e';g.beginPath();g.ellipse(0,0,5,2.4,0,0,TAU);g.fill();g.restore()}}};
+function ctxCrater(g,x,y){g.fillStyle='rgba(190,170,190,.35)';[[-12,-8,8],[10,6,6],[-4,14,5]].forEach(c=>{g.beginPath();g.arc(x+c[0],y+c[1],c[2],0,TAU);g.fill()})}
+function fire(g,x,y,t,s){const gl=g.createRadialGradient(x,y-20*s,4,x,y-20*s,120*s);gl.addColorStop(0,'rgba(255,170,70,.55)');gl.addColorStop(1,'rgba(255,120,30,0)');g.fillStyle=gl;g.fillRect(x-130*s,y-150*s,260*s,200*s);
+ for(let i=0;i<5;i++){const fl=Math.sin(t*9+i*1.7)*4;g.fillStyle=['#ff6a1a','#ff8a2a','#ffb84a','#ffe27a','#fff6c0'][i];g.beginPath();const w=(26-i*4)*s,hh=(58-i*8)*s;g.moveTo(x-w,y);g.quadraticCurveTo(x-w*1.1,y-hh*.55,x+fl*(i*.3),y-hh-fl);g.quadraticCurveTo(x+w*1.1,y-hh*.55,x+w,y);g.closePath();g.fill()}
+ for(let i=0;i<10;i++){const p=((t*.6+i*.17)%1);g.fillStyle='rgba(255,200,100,'+(1-p)+')';g.beginPath();g.arc(x+Math.sin(p*7+i)*22*s,y-p*130*s,1.8,0,TAU);g.fill()}}
+
+SC.shore={w:1200,y0:508,y1:566,name:'Lough Dubh',root:174.6,
+ back(g,w,h){sky(g,w,h,['#050818','#0f1a42','#22386e','#3f5a96']);stars(g,w,260,160,6);glow(g,820,142,44,'#f4f6ff','#b9c8ff',4.2);
+  ridge(g,w,300,40,'#1a2450',2,.007,h);ridge(g,w,330,24,'#121a3c',7,.012,h);
+  // island with the Hollow Hill
+  g.fillStyle='#0c1230';g.beginPath();g.ellipse(430,352,150,14,0,0,TAU);g.fill();const mg=g.createRadialGradient(430,300,6,430,330,120);mg.addColorStop(0,'#2e5a5a');mg.addColorStop(1,'#10223a');g.fillStyle=mg;g.beginPath();g.ellipse(430,350,118,52,0,Math.PI,TAU);g.fill();
+  glow(g,430,340,10,'#ffe9a8','#ffd27a',4);g.fillStyle='#ffe9a8';g.beginPath();g.moveTo(424,350);g.lineTo(424,335);g.quadraticCurveTo(430,328,436,335);g.lineTo(436,350);g.fill();
+  tree(g,360,336,50,'#0a0e24','#1a2a4a',3);tree(g,505,340,38,'#0a0e24','#1a2a4a',5);
+  cloudBand(g,0,352,w,24,'#6a86c8')},
+ main(g,w,h){const lg=g.createLinearGradient(0,352,0,486);lg.addColorStop(0,'#16306a');lg.addColorStop(1,'#08143a');g.fillStyle=lg;g.fillRect(0,352,w,140);
+  for(let i=0;i<46;i++){const y=356+i*2.9,wd=10+i*2.6;g.fillStyle='rgba(215,230,255,'+(.5-i*.009)+')';g.fillRect(820-wd/2+Math.sin(i*1.7)*6,y,wd,1.5)}
+  const gg=g.createLinearGradient(0,484,0,h);gg.addColorStop(0,'#1e2c3a');gg.addColorStop(1,'#0a121a');g.fillStyle=gg;ridge(g,w,486,5,'#223040',2,.02,h);g.fillRect(0,492,w,h);
+  for(let i=0;i<90;i++){const R=mulb(i+3);g.fillStyle=hexA('#8aa0b8',.15+R()*.2);g.beginPath();g.ellipse(R()*w,500+R()*90,4+R()*9,2+R()*3,0,0,TAU);g.fill()}
+  // jetty
+  g.fillStyle='#4a3826';g.fillRect(700,484,300,14);for(let i=0;i<20;i++){g.fillStyle=i%2?'#5a4630':'#6a5238';g.fillRect(700+i*15,484,13,12)}[740,860,980].forEach(x=>{g.fillStyle='#3a2a1c';g.fillRect(x,484,10,48)});
+  // hazel tree over the water
+  g.strokeStyle='#3a2c22';g.lineCap='round';g.lineWidth=14;g.beginPath();g.moveTo(118,520);g.quadraticCurveTo(128,440,176,404);g.stroke();g.lineWidth=7;g.beginPath();g.moveTo(150,440);g.quadraticCurveTo(220,420,262,432);g.stroke();
+  [[130,380,56],[190,372,50],[250,414,42],[96,404,40]].forEach(([x,y,r])=>{const cg=g.createRadialGradient(x,y,2,x,y,r);cg.addColorStop(0,'#3a6a4a');cg.addColorStop(1,'#16342e');g.fillStyle=cg;g.beginPath();g.arc(x,y,r,0,TAU);g.fill()});
+  [[152,420],[176,414],[210,400],[238,424]].forEach(([x,y])=>{g.fillStyle='#c9a05a';g.beginPath();g.arc(x,y,4,0,TAU);g.fill()});
+  // reeds
+  for(let i=0;i<70;i++){const R=mulb(i+31),x=(i%2?R()*180+1000:R()*120+20),y=500+R()*70;g.strokeStyle='#0d1a14';g.lineWidth=1.8;g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+(R()-.5)*14,y-30,x+(R()-.5)*26,y-50-R()*30);g.stroke()}},
+ dyn(g,t,cam,S){for(let i=0;i<30;i++){const R=mulb(i+1),y=366+R()*110,x=(R()*1200+Math.sin(t*.4+i)*20);g.fillStyle='rgba(220,235,255,'+(.08+.08*Math.sin(t*2+i))+')';g.fillRect(x,y,12+R()*30,1.2)}
+  for(let k=0;k<3;k++)cloudBand(g,(t*8+k*400)%1600-400,420+k*14,600,26,'#8aa0d8');
+  boat(g,S,t);
+  for(let i=0;i<18;i++){const R=mulb(i+55),x=R()*1200,y=440+R()*110+Math.sin(t+i)*8;g.fillStyle=hexA('#9fe8c0',.4+.3*Math.sin(t*2+i));g.beginPath();g.arc(x+Math.sin(t*.5+i)*14,y,1.6,0,TAU);g.fill()}}};
+function boat(g,S,t){const bx=S.f.crossing?S.boatX:880,by=470+Math.sin(t*1.3)*2.4;g.save();g.translate(bx,by);g.rotate(Math.sin(t*1.1)*.025);
+ g.fillStyle='#2a1a10';g.beginPath();g.moveTo(-90,-6);g.quadraticCurveTo(-60,26,0,26);g.quadraticCurveTo(60,26,96,-14);g.lineTo(80,-6);g.closePath();g.fill();g.fillStyle='#4a3020';g.fillRect(-88,-8,176,5);
+ g.strokeStyle='#6a5030';g.lineWidth=3;g.beginPath();g.moveTo(-40,-20);g.lineTo(-90,10);g.stroke();
+ g.restore();g.fillStyle='rgba(8,12,30,.35)';g.fillRect(bx-86,by+22,172,3);
+ if(S.sc==='shore'&&!S.f.crossing){drawPerson(g,'fiach',bx+18,by-8,t,-1,false,{s:1});
+  g.strokeStyle='#4a3a28';g.lineWidth=2.6;g.beginPath();g.moveTo(bx-30,by-18);g.lineTo(bx-30,by-120);g.stroke();g.lineTo(bx-18,by-120);g.stroke();glow(g,bx-18,by-110,5,'#c8f0ff','#9fe8ff',9)}}
+
+SC.hill={w:1300,y0:508,y1:566,name:'The Hollow Hill',root:164.8,
+ back(g,w,h){sky(g,w,h,['#04061a','#0e1440','#243a78','#3e5a98']);stars(g,w,300,170,12);glow(g,250,130,48,'#f6f8ff','#c8d4ff',4);
+  for(let k=0;k<3;k++){g.strokeStyle=hexA(['#6ff0b0','#6fd0ff','#a58bff'][k],.1);g.lineWidth=40;g.beginPath();for(let x=0;x<=w;x+=14){const y=120+k*34+Math.sin(x*.006+k)*40;x?g.lineTo(x,y):g.moveTo(x,y)}g.stroke()}
+  ridge(g,w,330,34,'#141a48',4,.008,h);ridge(g,w,360,22,'#0c1136',9,.012,h);for(let i=0;i<20;i++)tree(g,i*70+30,376+Math.sin(i)*6,40+i%3*10,'#080b22','#121a3c',i+8)},
+ main(g,w,h){const gg=g.createLinearGradient(0,380,0,h);gg.addColorStop(0,'#1e4a46');gg.addColorStop(1,'#0c1c22');g.fillStyle=gg;ridge(g,w,392,6,'#245a50',3,.014,h);g.fillRect(0,400,w,h);
+  for(let i=0;i<300;i++){const R=mulb(i+5),x=R()*w,y=400+R()*200;g.strokeStyle=hexA(R()<.5?'#5ab08a':'#143a34',.4);g.lineWidth=1;g.beginPath();g.moveTo(x,y);g.lineTo(x+(R()-.5)*5,y-4-R()*7);g.stroke()}
+  // the mound
+  const mx=960,my=506;const mg=g.createRadialGradient(mx-40,my-210,10,mx,my-100,300);mg.addColorStop(0,'#4a9a6a');mg.addColorStop(.6,'#2a6a50');mg.addColorStop(1,'#154036');g.fillStyle=mg;g.beginPath();g.moveTo(mx-300,my+4);g.bezierCurveTo(mx-260,my-190,mx-90,my-250,mx,my-250);g.bezierCurveTo(mx+90,my-250,mx+260,my-190,mx+300,my+4);g.closePath();g.fill();
+  for(let i=0;i<260;i++){const R=mulb(i+41),x=mx-280+R()*560,y=my-230+R()*230;const inside=Math.abs(x-mx)<290*Math.sqrt(Math.max(0,1-Math.pow((y-my+250)/250-1,2)))*1;if(!inside)continue;g.strokeStyle=hexA(R()<.5?'#7ad0a0':'#1a4a3a',.4);g.lineWidth=1;g.beginPath();g.moveTo(x,y);g.lineTo(x+(R()-.5)*5,y-4-R()*6);g.stroke()}
+  for(let i=0;i<13;i++){const x=mx-286+i*47.6,y=my-2;g.fillStyle=i%2?'#8a8a9a':'#7a7a8a';g.beginPath();g.ellipse(x,y,26,15,0,Math.PI,TAU);g.fill();g.fillStyle='rgba(0,0,0,.22)';g.fillRect(x-26,y,52,4)}
+  // portal
+  g.fillStyle='#6c6c7c';g.fillRect(mx-60,my-130,22,128);g.fillRect(mx+38,my-130,22,128);g.beginPath();g.roundRect(mx-76,my-152,152,28,6);g.fill();
+  g.fillStyle='#14161e';g.beginPath();g.roundRect(mx-38,my-124,76,122,[34,34,0,0]);g.fill();
+  spiral3(g,mx,my-138,12,'rgba(220,232,255,.5)',2);
+  g.fillStyle='rgba(255,255,255,.08)';g.fillRect(mx-60,my-130,5,128);
+  // hawthorn with ribbons
+  g.strokeStyle='#2a1c18';g.lineCap='round';g.lineWidth=16;g.beginPath();g.moveTo(130,524);g.quadraticCurveTo(110,470,140,420);g.stroke();
+  tree(g,138,430,170,'#2a1c18','#1c3a2a',21);for(let i=0;i<40;i++){const R=mulb(i+60);g.fillStyle='#f4f0e8';g.beginPath();g.arc(70+R()*140,300+R()*100,2,0,TAU);g.fill()}
+  ['#e0383c','#4fb6ff','#ffd23f','#ffffff'].forEach((c,i)=>{g.strokeStyle=c;g.lineWidth=3;g.beginPath();g.moveTo(180+i*14,420+i*4);g.quadraticCurveTo(184+i*14,440,178+i*14,454+i*4);g.stroke()});
+  // rock for the púca
+  g.fillStyle='#4a4a5a';g.beginPath();g.ellipse(270,530,52,22,0,Math.PI,TAU);g.fill();g.fillStyle='rgba(255,255,255,.1)';g.beginPath();g.ellipse(258,512,24,6,0,0,TAU);g.fill();
+  // ogham ring stones
+  [420,540,660].forEach(x=>{standingStone(g,x,540,150,46,'#5a5a72')});
+  // jetty edge
+  g.fillStyle='#4a3826';g.fillRect(0,520,60,10)},
+ dyn(g,t,cam,S){[420,540,660].forEach((x,i)=>{const n=S.stones[i],on=S.f.ogDone;const gl=.55+.35*Math.sin(t*2+i);ogham(g,x-2,500,n,96,on?'#fff6c0':hexA('#8fe8ff',gl),3.4);if(on)glow(g,x,450,6,null,'#fff2a0',14)});
+  if(S.f.ogDone){const mx=960,my=506;glow(g,mx,my-60,10,null,'#ffe9a8',14);const gl=g.createLinearGradient(mx,my-124,mx,my);gl.addColorStop(0,'#fff6c8');gl.addColorStop(1,'#ffd27a');g.fillStyle=gl;g.beginPath();g.roundRect(mx-38,my-124,76,122,[34,34,0,0]);g.fill();spiral3(g,mx,my-138,12,'rgba(255,240,170,.95)',2.4)}
+  else{const gl=.3+.2*Math.sin(t*1.6);spiral3(g,960,368,12,'rgba(170,230,255,'+gl+')',2.4)}
+  for(let k=0;k<3;k++)cloudBand(g,(t*10+k*500)%1900-500,500+k*10,700,22,'#7a9ad8');
+  for(let i=0;i<26;i++){const R=mulb(i+13),x=R()*1300,y=420+R()*130+Math.sin(t+i)*9;g.fillStyle=hexA('#a8ffc8',.4+.4*Math.sin(t*2+i*2));g.beginPath();g.arc(x+Math.sin(t*.6+i)*16,y,1.8,0,TAU);g.fill()}}};
+
+SC.court={w:1500,y0:508,y1:566,name:'Tír na nÓg',root:220,
+ back(g,w,h){sky(g,w,h,['#0b3a52','#1f7a86','#7ad0b8','#f2e6a0']);glow(g,750,150,60,'#fffbe0','#fff2a8',4.4);
+  for(let i=0;i<60;i++){const R=mulb(i+8);g.fillStyle='rgba(255,255,255,'+(.3+R()*.5)+')';g.fillRect(R()*w,R()*260,1.6,1.6)}
+  ridge(g,w,330,36,'#3a9a9a',3,.006,h);ridge(g,w,356,28,'#2a8088',8,.01,h);
+  for(let i=0;i<14;i++){const x=40+i*108;tree(g,x,380,110+i%3*22,'#1a5a60','#8af0d0',i+3,'#8af0d0')}
+  cloudBand(g,0,390,w,26,'#e8fff4')},
+ main(g,w,h){const gg=g.createLinearGradient(0,394,0,h);gg.addColorStop(0,'#3aa08a');gg.addColorStop(1,'#104a50');g.fillStyle=gg;ridge(g,w,402,6,'#46b096',2,.012,h);g.fillRect(0,410,w,h);
+  for(let i=0;i<420;i++){const R=mulb(i+17),x=R()*w,y=410+R()*190;g.strokeStyle=hexA(R()<.5?'#a8ffd8':'#0c4a48',.35);g.lineWidth=1;g.beginPath();g.moveTo(x,y);g.lineTo(x+(R()-.5)*5,y-4-R()*8);g.stroke()}
+  for(let i=0;i<90;i++){const R=mulb(i+90);const x=R()*w,y=440+R()*150;g.fillStyle=['#fff6a0','#ffc6e8','#c6f0ff'][i%3];g.shadowColor='#fff';g.shadowBlur=6;g.beginPath();g.arc(x,y,2,0,TAU);g.fill();g.shadowBlur=0}
+  // river of light
+  g.fillStyle='rgba(200,255,240,.35)';g.beginPath();g.moveTo(0,590);g.bezierCurveTo(300,560,500,600,760,584);g.bezierCurveTo(1000,570,1200,596,1500,570);g.lineTo(1500,600);g.lineTo(0,600);g.closePath();g.fill();
+  // two great trees forming the arch of the court
+  [[620,1],[1040,-1]].forEach(([x,s])=>{g.strokeStyle='#6a5a48';g.lineCap='round';g.lineWidth=46;g.beginPath();g.moveTo(x,540);g.quadraticCurveTo(x+s*8,420,x-s*10,300);g.stroke();});
+  g.strokeStyle='#6a5a48';g.lineWidth=20;g.beginPath();g.moveTo(610,300);g.quadraticCurveTo(830,60,1050,300);g.stroke();
+  for(let i=0;i<46;i++){const R=mulb(i+121),a=Math.PI+R()*Math.PI,r=250+R()*40,x=830+Math.cos(a)*r*1.0,y=300+Math.sin(a)*r*.62;g.fillStyle=hexA(['#8af0d0','#fff6a0','#a8ffb8'][i%3],.65);g.beginPath();g.ellipse(x,y,22,12,R()*3,0,TAU);g.fill()}
+  // dais + throne
+  g.fillStyle='#7a6a58';g.beginPath();g.ellipse(830,534,150,24,0,0,TAU);g.fill();g.fillStyle='#968470';g.beginPath();g.ellipse(830,526,150,22,0,0,TAU);g.fill();
+  g.strokeStyle='#d8c890';g.lineWidth=5;g.lineCap='round';[-1,1].forEach(s=>{g.beginPath();g.moveTo(830+s*18,520);g.quadraticCurveTo(830+s*70,430,830+s*40,330);g.moveTo(830+s*50,400);g.lineTo(830+s*92,376);g.moveTo(830+s*58,350);g.lineTo(830+s*96,322);g.stroke()});
+  // harp on the arch
+  g.strokeStyle='#d8b84a';g.lineWidth=4;g.beginPath();g.moveTo(710,300);g.quadraticCurveTo(690,250,730,226);g.quadraticCurveTo(760,240,752,300);g.stroke();g.lineWidth=1.2;g.strokeStyle='#fff6c8';for(let i=0;i<6;i++){g.beginPath();g.moveTo(716+i*6,296-i*4);g.lineTo(716+i*6+6,240+i*2);g.stroke()}
+  // feast table
+  g.fillStyle='#e8f4ec';g.fillRect(310,486,210,10);g.fillStyle='#b8d8cc';g.fillRect(320,496,190,34);g.fillStyle='#9ec4b8';g.fillRect(324,500,8,30);g.fillRect(498,500,8,30);
+  [[350,478],[388,476],[470,478]].forEach(([x,y],i)=>{g.fillStyle=i===1?'#ffd23f':'#ff8a4a';g.shadowColor='#ffd27a';g.shadowBlur=10;g.beginPath();g.arc(x,y-6,9,0,TAU);g.fill();g.shadowBlur=0});g.fillStyle='#d8e8f4';[[420,478],[444,478]].forEach(([x,y])=>{g.beginPath();g.moveTo(x-5,y-12);g.lineTo(x+5,y-12);g.lineTo(x+3,y);g.lineTo(x-3,y);g.fill()});
+  // cauldron
+  g.fillStyle='#8a7a68';g.beginPath();g.ellipse(1340,540,66,14,0,0,TAU);g.fill();g.fillStyle='#17131f';g.beginPath();g.ellipse(1340,478,56,50,0,0,Math.PI);g.fill();g.beginPath();g.ellipse(1340,478,56,14,0,0,TAU);g.fill();g.strokeStyle='#d8b84a';g.lineWidth=3;g.beginPath();g.ellipse(1340,478,56,14,0,0,TAU);g.stroke();
+  [-1,0,1].forEach(s=>{g.fillStyle='#17131f';g.fillRect(1340+s*34-5,520,10,24)});
+  // mound door (exit) at left
+  g.fillStyle='#4a6a68';g.beginPath();g.roundRect(40,380,120,170,[60,60,0,0]);g.fill();g.fillStyle='#fff2c0';g.beginPath();g.roundRect(60,400,80,150,[40,40,0,0]);g.fill();spiral3(g,100,462,16,'rgba(150,110,40,.65)',2.4)},
+ dyn(g,t,cam,S){glow(g,1340,452,8,null,'#ffb25a',16);const fl=Math.sin(t*6)*3;g.fillStyle='#ff9a3a';g.beginPath();g.ellipse(1340,468+fl*.2,40,10,0,0,TAU);g.fill();g.fillStyle='#ffe27a';g.beginPath();g.ellipse(1340,466,26,6,0,0,TAU);g.fill();
+  if(!S.f.ember)for(let i=0;i<10;i++){const p=((t*.4+i*.1)%1);g.fillStyle='rgba(255,200,100,'+(1-p)+')';g.beginPath();g.arc(1340+Math.sin(p*6+i)*24,466-p*80,2,0,TAU);g.fill()}
+  glow(g,830,330,12,null,'#8af0d0',12);
+  for(let i=0;i<70;i++){const R=mulb(i+3),x=(R()*1500+Math.sin(t*.4+i)*30),y=(R()*480+400-((t*8*(.4+R()))%480))%480+20;g.fillStyle=hexA(['#fff6a0','#a8ffd8','#ffc6e8'][i%3],.4+.4*Math.sin(t*2+i));g.beginPath();g.arc(x,y,1.5+R()*1.5,0,TAU);g.fill()}
+  [700,960].forEach((x,i)=>{g.fillStyle='#fff6a0';g.shadowColor='#fff6a0';g.shadowBlur=14;g.beginPath();g.arc(x+Math.sin(t+i)*8,260+Math.sin(t*1.3+i)*6,5,0,TAU);g.fill();g.shadowBlur=0})}};
+
+/* ---------- items, lore ---------- */
+const ITEMS={
+ iron:{n:'Cold iron nail',d:'A horseshoe nail. Iron wounds the Folk, and breaks the peace of any hearth where it is drawn.'},
+ rowan:{n:'Rowan twig',d:'Red berries and a five-pointed star on each one. Rowan cuts through glamour and binds a trickster to the truth.'},
+ flint:{n:'Flint',d:'A grey chip with a sharp edge. Strike it with iron and it spits sparks.'},
+ candle:{n:'Candle end',d:'Beeswax, half burnt. Nan keeps these for the long nights.'},
+ candleLit:{n:'Lit candle',d:'Lit from honest sparks, which is the only kind of light the old stories trust.'},
+ bread:{n:'Barmbrack',d:'Samhain bread, speckled with fruit. A gift of bread binds both giver and receiver.'},
+ lantern:{n:'Turnip lantern',d:'Dara’s carving: a grinning turnip with a candle inside, meant to scare wandering spirits.'},
+ whistle:{n:'Tin whistle',d:'Dara’s whistle. Five holes, five notes. Tap it, then tap someone to play for them.'},
+ hazel:{n:'Hazelnut',d:'Dropped from the hazels over the Lough, where the Salmon of Knowledge once swam. One flash of insight, once.'},
+ ember:{n:'Turnip lantern with the Old Fire',d:'A coal from the first hearth, burning blue-gold and warm as a promise. Carry it home.'}
+};
+const LORE={
+ geasa:['Your three geasa','Give no thanks to the Folk. Eat nothing in their halls. Give no true name. Break one and the Otherworld owns a piece of you.'],
+ sleep:['The Sleep Strain (suantraí)','Nan’s lullaby: four steps down a stair. Whistle notes 4, 3, 2, 1.'],
+ joy:['The Joy Strain (geantraí)','Dara’s jig: low, middle, high, middle. Whistle notes 1, 3, 5, 3.'],
+ sorrow:['The Sorrow Strain (goltraí)','Fiach’s keen: a wobble, then a fall. Whistle notes 2, 3, 2, 1.'],
+ ogham:['Ogham, the tree-letters','Strokes along a stem. One stroke: Beith, birch. Two: Luis, rowan. Three: Fearn, alder. Four: Sail, willow.'],
+ trees:['The Hill’s door','Three trees, in order. Birch begins. Rowan guards. Alder opens.'],
+ hospitality:['Guest-right','A host may not harm a guest, nor a guest the host, once bread is shared. It is the oldest law, older than kings.'],
+ lady:['On the Lady','She cannot refuse a fair bargain. She cannot be thanked without being pleased. Guest-right binds her kind above all.'],
+ iron:['Cold iron','Iron wounds the Folk. Drawing it in their hall breaks hospitality and ends the bargain.'],
+ names:['True names','A name spoken to the Folk is a leash. A name you made on the spot holds just as well, so long as you answer to it.']
+};
+const NAMES_JOY=[1,3,5,3],NAMES_SLEEP=[4,3,2,1],NAMES_SORROW=[2,3,2,1];
+
+/* ---------- dialogue ---------- */
+const DL={
+ nan1:{w:'Nan Bríd',t:'Samhain Eve, and the hearth gone cold. Not a spark since noon, Orla. Brigid’s flame has kept Dunmara since before my grandmother’s grandmother, and tonight it simply went out.',n:'nan2'},
+ nan2:{w:'Orla',t:'But we did everything right. The turnips are carved. The cakes are baked.',n:'nan3'},
+ nan3:{w:'Nan Bríd',t:'Did we? Tonight the door in the Hollow Hill stands open, and what is owed to the Folk is owed tonight. We forgot their share, so they have kept the flame as surety. A debt is not a theft, child. Debts can be settled.',ch:[{t:'Then I will go and settle it.',n:'nan4'},{t:'Can’t we just ask for it back?',n:'nan3b'}]},
+ nan3b:{w:'Nan Bríd',t:'Ask? Beg? The Folk despise a beggar and adore a bargain. You go to that hill as a guest, and you trade as an equal.',n:'nan4'},
+ nan4:{w:'Nan Bríd',t:'Cross the lough to the island. Find the door in the Hollow Hill. Ask the Lady for one coal of the Old Fire and carry it home in a lantern. Take iron from my horseshoe, rowan from the tree, and bread from Dara’s oven. Dara has a lantern he’s proud of, too.',n:'nan5'},
+ nan5:{w:'Nan Bríd',t:'And take three geasa upon you, like the heroes of old. One: give no thanks to the Folk, for thanks is a debt admitted. Two: eat nothing in their halls. Three: give no true name, for a name spoken is a leash.',fx:()=>lore('geasa'),ch:[{t:'I swear it.',n:'nan6'},{t:'And if I break one?',n:'nan5b'}]},
+ nan5b:{w:'Nan Bríd',t:'Then the Otherworld owns a piece of you, and the piece grows. Choose each word like it costs coin.',n:'nan6'},
+ nan6:{w:'Nan Bríd',t:'Here is a lullaby my mother sang. Four steps down a stair, and whatever listens falls asleep. Dara has a tin whistle he never learned to play. Ask him. And study my doorpost: the Hill speaks only in tree-letters.',fx:()=>{lore('sleep');setF('nanTold')}},
+ nanRemind:{w:'Nan Bríd',t:'Iron, rowan, bread, a lantern with a light in it, and Dara’s whistle. Then the lough. And remember: no thanks to the Folk, no food, no true name.'},
+ nanDone:{w:'Nan Bríd',t:'Go, then. Quickly. The door in the Hill only stays open while the night is thin.'},
+ nanReturn:{w:'Nan Bríd',t:'Is that… oh, child. Set it in the hearth. Gently.'},
+ dara1:{w:'Dara',t:'Orla! I carved the best turnip lantern in Dunmara and it’s dark as a grave. Da’s tinderbox is lost and the hearth is dead.',n:'dara2'},
+ dara2:{w:'Dara',t:'Light it for me and it’s yours, and my barmbrack, and my whistle. Da says iron on flint makes sparks. There’s flint by the hearth ring, and Nan keeps a candle end on her sill.',fx:()=>setF('daraTold')},
+ daraRemind:{w:'Dara',t:'Iron on flint, flint on candle, candle in turnip. That’s all it takes. I think.'},
+ daraWin:{w:'Dara',t:'It’s lit! Look at his face, he’s glorious. Take him, and the barmbrack, and my whistle. The jig goes low, middle, high, middle.',fx:()=>{take('candleLit');give('lantern');give('bread');give('whistle');lore('joy');setF('daraDone')},n:'daraWin2'},
+ daraWin2:{w:'Orla',t:'Thank you, Dara.',n:'daraWin3'},
+ daraWin3:{w:'Dara',t:'Carry the Old Fire home in him! That’s how the stories go.'},
+ daraAfter:{w:'Dara',t:'Be careful out there. Bran will be sad you’re leaving him at the water.'},
+ fi1:{w:'Fiach',t:'A living soul abroad on Samhain Eve. I row for the Lord of the Waves, and none cross unasked. Who comes?',ch:[{t:'“Orla, daughter of Cathal.”',n:'fiTrue'},{t:'“I will not say.”',n:'fiNone'},{t:'“Call me Rowan.”',n:'fiFalse'}]},
+ fiTrue:{w:'Fiach',t:'Orla, daughter of Cathal. Written in the tally. Names run far over water, girl.',fx:()=>{hon(-1);setF('nameGiven');setF('fiMet')},n:'fi2'},
+ fiNone:{w:'Fiach',t:'Wise. Many have crossed to the Hill under the name Nobody.',fx:()=>{setF('fiMet');lore('names')},n:'fi2'},
+ fiFalse:{w:'Fiach',t:'A name you made yourself holds as well as any, so long as you answer to it.',fx:()=>{setF('fiMet');lore('names')},n:'fi2'},
+ fi2:{w:'Fiach',t:'The toll is bread, broken at the water’s edge.',ch:[{t:'Offer the barmbrack.',n:'fi3',if:()=>has('bread')},{t:'I will return with it.',n:null}]},
+ fi3:{w:'Fiach',t:'Bread given, passage owed. That is guest-right: the host may not harm the guest, nor the guest the host. Remember it when you stand in the Lady’s hall.',fx:()=>{take('bread');setF('paid');lore('hospitality')},n:'fi4'},
+ fi4:{w:'Fiach',t:'A word for the road, since you did not haggle. The Hill’s door answers to three trees in order. Birch begins. Rowan guards. Alder opens.',fx:()=>lore('trees'),n:'fi5'},
+ fi5:{w:'Fiach',t:'And something to hum on the water. Low and mournful. You’ll want it if you are ever asked to make a heart ache.',fx:()=>lore('sorrow'),ch:[{t:'Row me across.',n:'fiGo'}]},
+ fiGo:{w:'',t:'The oars dip. The lough takes you.',end:()=>{go('hill',70)}},
+ fiAgain:{w:'Fiach',t:'Bread is paid. Say the word and we cross.',ch:[{t:'Row me across.',n:'fiGo'},{t:'Not yet.',n:null}]},
+ pu1:{w:'Púca',t:'Pretty one, pretty one, alone on the Hill! Ride on my back and I’ll carry you to the door before you blink.',ch:[{t:'No, thank you.',n:'puThanks'},{t:'I walk my own road.',n:'pu3'},{t:'What would you want in return?',n:'pu3b'}]},
+ puThanks:{w:'Púca',t:'Thank you! She says thank you! Oh, a lovely little debt. I will collect it by morning.',fx:()=>hon(-1),n:'pu3'},
+ pu3:{w:'Púca',t:'Then listen, since you won’t ride. The door wants Rowan first, then Alder, then Birch last. I never lie. Never!',fx:()=>setF('pucaLied')},
+ pu3b:{w:'Púca',t:'Only a name, pretty one. Just your name. A tiny little leash.',n:'pu3'},
+ puTruth:{w:'Púca',t:'Ach! Rowan! You’ve bound my tongue to the truth. Fine, FINE. Birch, then Rowan, then Alder, the way the trees go. And the Lady cannot refuse a fair bargain, nor break guest-right. Offer her something she can’t buy, and she must take it.',fx:()=>{setF('pucaTruth');lore('lady');lore('trees')}},
+ puJoy:{w:'Púca',t:'Oh, THAT jig! I’ll tell you anything for the dance. Birch, Rowan, Alder. And the Lady loves guest-right more than she loves gold. Offer her a hearth, and she must take it.',fx:()=>{setF('pucaTruth');lore('lady');lore('trees')}},
+ l1:{w:'The Lady',t:'A mortal at my table on the night of open doors. Welcome, guest. Sit. Eat. Drink. All here is yours.',ch:[{t:'I’ll stand, and I’ll eat nothing.',n:'l2'},{t:'Thank you for the welcome.',n:'lThank'},{t:'I’ll take a little wine.',n:'lEat'}]},
+ lThank:{w:'The Lady',t:'Thank you? Oh, delicious. A debt, then. I do so enjoy debts.',fx:()=>hon(-1),n:'l2'},
+ lEat:{w:'The Lady',t:'Wine of the hollow hills. You will find that the morning tastes thinner, now.',fx:()=>hon(-2),n:'l2'},
+ l2:{w:'The Lady',t:'And what shall I call my guest?',ch:[{t:'“Orla, daughter of Cathal.”',n:'lName'},{t:'“Rowan.”',n:'l3'},{t:'“A guest needs only courtesy, not a name.”',n:'l3'}]},
+ lName:{w:'The Lady',t:'Orla. Orla. I shall keep that somewhere safe.',fx:()=>hon(-1),n:'l3'},
+ l3:{w:'The Lady',t:'The Folk ask in threes, so: three trials before a bargain. First. I am older than the stones yet born each dawn. Feed me and I grow. Give me water and I die. What am I?',ch:[{t:'Fire.',n:'l4'},{t:'Frost.',n:'l3w'},{t:'A shadow.',n:'l3w'},{t:'(Eat the hazelnut of knowledge.)',n:'l3h',if:()=>has('hazel')}]},
+ l3w:{w:'The Lady',t:'Wrong, little guest. Wrong answers cost nothing in this house but time, and we have so much of that.',n:'l3'},
+ l3h:{w:'',t:'The nut cracks bright on your tongue. For one breath you know a hundred things, and one of them is the answer.',fx:()=>take('hazel'),n:'l3h2'},
+ l3h2:{w:'Orla',t:'Fire.',n:'l4'},
+ l4:{w:'The Lady',t:'Well answered. Second. What do mortals have that my people lack?',ch:[{t:'Time that runs out.',n:'l5'},{t:'Cold iron.',n:'l4i'},{t:'Gold.',n:'l4w'}]},
+ l4i:{w:'The Lady',t:'Do not say that word in my house. Try again, guest, and mind your manners.',n:'l4'},
+ l4w:{w:'The Lady',t:'We have more gold than there are stars. Try again.',n:'l4'},
+ l5:{w:'The Lady',t:'Yes. We have all the time there is, so nothing costs us anything, and nothing is ever dear. Third. Make my court feel something. Play. Sleep, laughter or grief: choose with care. A court wrongly moved remembers.',fx:()=>setF('trial3'),end:()=>{if(has('whistle'))openWhistle('court');else say('You have no instrument. You will have to find another way to speak to a heart.')}},
+ lSorrow:{w:'The Lady',t:'Grief. No one has made my court weep since the Dagda’s harp was hung. That was well done, mortal. Very well done.',fx:()=>{setF('moved');hon(1);setF('trial3done')},n:'l6'},
+ lJoy:{w:'The Lady',t:'Laughter. Pleasant, and a little shallow, but my people have not laughed in a century. I will allow it.',fx:()=>setF('trial3done'),n:'l6'},
+ lSleep:{w:'The Lady',t:'Ah. You have put my whole court to sleep, my guard included. Clever. And a little rude. I will remember it.',fx:()=>{setF('guardSleeps');setF('trial3done');hon(-1)},n:'l6'},
+ lWrong:{w:'The Lady',t:'That is not a tune I know. Try again, guest. Four notes.',end:()=>openWhistle('court')},
+ l6:{w:'The Lady',t:'Three trials done. Ask, guest, and I will name the price.',n:'l7'},
+ l7:{w:'Orla',t:'I ask for one coal of the Old Fire, to relight the hearth of Dunmara.',n:'l8'},
+ l8:{w:'The Lady',t:'Fire is not given; it is exchanged. Name your price, or take mine.',ch:[
+  {t:'Take a year of my life.',n:'bYear',fx:()=>setF('bYear')},
+  {t:'Take my true name.',n:'bName'},
+  {t:'Take this song, freely given.',n:'bSong',if:()=>F('moved')},
+  {t:'Come to my hearth each Samhain. A seat and a share will be kept for you and yours.',n:'bHearth',if:()=>lored('hospitality')&&(F('pucaTruth')||lored('lady'))}]},
+ bYear:{w:'The Lady',t:'A year. Plain and honest. I will take it from the end, where you will not miss it.',fx:()=>setF('bargain_year'),n:'lBlessing'},
+ bName:{w:'The Lady',t:'Your name! I did hope. Oh, thank… no, no. I will not say it. It is mine now.',fx:()=>{setF('bargain_name');hon(-2)},n:'lBlessing'},
+ bSong:{w:'The Lady',t:'A song for a flame. That is a fair bargain, and gifts freely given bind no one. Take it, guest.',fx:()=>setF('bargain_song'),n:'lBlessing'},
+ bHearth:{w:'The Lady',t:'A seat at a mortal hearth. A share at a mortal table. Guest-right! The oldest bargain there is, and none have offered it in ages. I accept, and gladly.',fx:()=>setF('bargain_hearth'),n:'lBlessing'},
+ lBlessing:{w:'The Lady',t:'Take your coal. My guard keeps the Old Fire from thieves, and does not know you are not one. Put him to sleep if you can. I will not help him, and I will not help you.',fx:()=>setF('bargain')},
+ lWait:{w:'The Lady',t:'The coal is yours to take, guest. Mind the guard.'},
+ lBye:{w:'The Lady',t:'Go with my leave. And do not thank me.',ch:[{t:'Fare well, Lady.',n:null},{t:'Thank you.',n:'lByeT'}]},
+ lByeT:{w:'The Lady',t:'Ah. There it is. I knew you would.',fx:()=>hon(-1)}
+};
+
+/* ---------- state + story helpers ---------- */
+const S={sc:'village',f:{},inv:[],lore:[],hon:2,stones:[4,4,4],px:430,py:540,face:1,boatX:880,sel:null};
+const F=k=>!!S.f[k], setF=k=>{S.f[k]=true;save()}, has=i=>S.inv.includes(i), lored=i=>S.lore.includes(i), hon=n=>{S.hon+=n;save()};
+function give(i){if(!has(i)){S.inv.push(i);chime();renderInv();toast('Got: '+ITEMS[i].n);save()}}
+function take(i){S.inv=S.inv.filter(x=>x!==i);if(S.sel===i)S.sel=null;renderInv();save()}
+function lore(id){if(!S.lore.includes(id)){S.lore.push(id);toast('Lore added: '+LORE[id][0]);$('bJ').classList.add('pulse');save()}}
+const T=id=>run(DL[id]);
+const FAIL=['That won’t help here.','Orla turns it over. No.','Nothing happens. The night is watching.','Not like that.'];
+const fail=()=>say(FAIL[(Math.random()*FAIL.length)|0]);
+
+const goalText=()=>{
+ if(F('hearth'))return 'The hearth burns again.';
+ if(!F('nanTold'))return 'Speak with Nan Bríd by the cold hearth.';
+ if(!F('daraDone'))return 'Dara needs his turnip lantern lit. Iron on flint, to catch a candle. Gather what you need around the village.';
+ if(!F('paid'))return 'Go to Lough Dubh. Fiach the ferryman wants bread for the crossing.';
+ if(S.sc==='shore')return 'Ask Fiach to row you across.';
+ if(!F('ogDone'))return 'The Hill’s door answers to three tree-letters. Order matters.';
+ if(!F('bargain'))return 'Go in and speak with the Lady of the Hill. Mind your geasa.';
+ if(!F('ember'))return 'Put the guard to sleep, then take a coal from the cauldron with Dara’s lantern.';
+ return 'Carry the Old Fire home to the Dunmara hearth.'};
+
+/* ---------- combine items ---------- */
+function combine(a,b){
+ const set=['iron','flint','candle'];
+ if(set.includes(a)&&set.includes(b)&&a!==b){
+  if(has('iron')&&has('flint')&&has('candle')){take('flint');take('candle');give('candleLit');say('Iron strikes flint. A spark leaps, the wick drinks it, and the flame stands up small and steady. Honest sparks, honestly struck.');S.sel=null;renderInv();return}
+  return say('Iron and flint make sparks, but they need a wick to catch them. You need all three.')}
+ fail()}
+
+/* ---------- hotspots ---------- */
+const HS={
+village:[
+ {id:'nan',n:'Nan Bríd',b:[292,392,372,514],stand:392,look:'Nan Bríd, who knows every old rule in Dunmara and keeps most of them secret. She is looking at the cold hearth, not at you.',act:['Talk',()=>{
+   if(F('hearth'))return say('Nan has not stopped smiling since dawn.');
+   if(!F('nanTold'))return T('nan1');
+   if(has('ember'))return T('nanReturn');
+   if(has('lantern')&&has('bread')||F('paid'))return T('nanDone');return T('nanRemind')}],use:{}},
+ {id:'dara',n:'Dara',b:[848,430,912,526],stand:800,look:'Dara, the miller’s boy, hugging a turnip carved into a grin. It is as dark as a grave.',act:['Talk',()=>{
+   if(!F('daraTold'))return T('dara1');if(!F('daraDone'))return T('daraRemind');T('daraAfter')}],
+  use:{candleLit:()=>{if(!F('daraTold'))T('dara1');else T('daraWin')},bread:()=>say('Dara has plenty of bread. What he doesn’t have is light.')}},
+ {id:'hearth',n:'The hearth',b:[572,500,712,548],stand:620,look:'The hearth ring of Dunmara, cold as a stone in a river. Brigid’s flame has burned here since before the church bells.',use:{ember:()=>finish()}},
+ {id:'horse',n:'Horseshoe',b:[282,384,320,416],stand:300,look:'A horseshoe over Nan’s door, nails still in it. Cold iron: the one metal the Folk cannot abide.',act:['Take a nail',()=>{
+   if(has('iron')||F('gotIron'))return say('One nail is enough. Nan wants a horseshoe, not a hole.');
+   if(!F('nanTold'))return say('Nan’s horseshoe. Better ask her first.');
+   S.f.gotIron=true;give('iron');lore('iron')}]},
+ {id:'rowan',n:'Rowan tree',b:[40,330,170,524],stand:190,look:'A rowan, heavy with red berries. Each berry wears a tiny five-pointed star: a ward older than the saints.',act:['Break a twig',()=>{
+   if(has('rowan')||F('gotRowan'))return say('Take only what you need from a rowan. You have your twig.');
+   S.f.gotRowan=true;give('rowan')}]},
+ {id:'flint',n:'Flint stones',b:[530,534,592,566],stand:560,look:'Grey flint chips beside the hearth, left from lighting a thousand fires.',act:['Take flint',()=>{
+   if(has('flint')||F('gotFlint')||has('candleLit'))return say('You have your flint.');S.f.gotFlint=true;give('flint')}]},
+ {id:'candle',n:'Candle end',b:[216,420,250,450],stand:260,look:'A stub of beeswax on Nan’s windowsill.',act:['Take candle',()=>{
+   if(has('candle')||F('gotCandle')||has('candleLit'))return say('You already have the candle.');S.f.gotCandle=true;give('candle')}]},
+ {id:'post',n:'Doorpost',b:[358,402,388,492],stand:410,look:()=>{lore('ogham');return 'Nan’s doorpost, scored with lines along a stem: one, two, three, four. Ogham, the tree-letters. One stroke is Beith, birch. Two is Luis, rowan. Three is Fearn, alder. Four is Sail, willow.'}},
+ {id:'stone',n:'Standing stone',b:[1196,380,1280,542],stand:1160,look:'The Dunmara stone, worn smooth by a thousand Samhains. Three spiral loops that never break. They say it hums at midnight on this one night.'}
+],
+shore:[
+ {id:'fiach',n:'Fiach, the ferryman',b:[830,360,970,480],stand:770,look:'A hooded boatman, grey as the lough, a pale lamp at his prow. He has not moved since you arrived.',act:['Speak',()=>{
+   if(!F('fiMet'))return T('fi1');if(!F('paid'))return T('fi2');T('fiAgain')}],
+  use:{bread:()=>{if(!F('fiMet'))T('fi1');else if(!F('paid'))T('fi3');else say('Fiach has been paid.')},lantern:()=>say('Fiach shrinks from the grinning turnip, then nods. A fair lamp for a fair night.')}},
+ {id:'bran',n:'Bran',b:[515,495,610,552],stand:480,look:'Bran, your wolfhound, all wet nose and worried eyes. He is not allowed on the Hill. Hounds see too much.',act:['Pet',()=>say('Bran presses against your legs and sighs. He will wait here, as hounds do. A good dog guards the way home.')]},
+ {id:'hazel',n:'Hazel tree',b:[90,360,300,525],stand:320,look:'Hazels lean out over the black water. Nine hazels grew over the Well of Wisdom, and the Salmon of Knowledge swam beneath, eating their nuts.',act:['Shake a branch',()=>{
+   if(has('hazel')||F('gotHazel')){return say('The branches are bare of nuts.')}S.f.gotHazel=true;give('hazel');say('A single hazelnut falls and rolls to your feet. You feel the old stories listening.')}]},
+ {id:'water',n:'The lough',b:[330,400,690,490],stand:560,look:'Lough Dubh, the black lake. On Samhain the water is a door as well as a lake.',quiet:true}
+],
+hill:[
+ {id:'puca',n:'The púca',b:[225,430,340,538],stand:370,look:'A black horse with golden eyes and a smile that is much too intelligent. A púca: shape-changer, trickster, and on Samhain, a prophet who prefers to lie.',act:['Talk',()=>{
+   if(F('pucaTruth'))return say('The púca flicks an ear. “I have told you everything I can. Go and be clever somewhere else.”');
+   if(F('pucaLied'))return say('“Rowan, Alder, Birch!” the púca says, and grins. “Or is it? Hmm.”');T('pu1')}],
+  use:{rowan:()=>{if(F('pucaTruth'))return say('The púca winces at the rowan and says nothing more.');T('puTruth')},
+       whistle:()=>{if(F('pucaTruth'))return say('The púca has been told to be honest now. He pretends not to hear you.');openWhistle('puca')}}},
+ {id:'st0',n:'First stone',b:[388,380,452,545],stand:380,look:'A standing stone with a glowing ogham stem. Touch it and the strokes shift.',act:['Touch',()=>stone(0)]},
+ {id:'st1',n:'Second stone',b:[508,380,572,545],stand:500,look:'A standing stone with a glowing ogham stem. Touch it and the strokes shift.',act:['Touch',()=>stone(1)]},
+ {id:'st2',n:'Third stone',b:[628,380,692,545],stand:620,look:'A standing stone with a glowing ogham stem. Touch it and the strokes shift.',act:['Touch',()=>stone(2)]},
+ {id:'door',n:'The Hill’s door',b:[890,350,1030,510],stand:900,look:()=>F('ogDone')?'The spiral door stands open, spilling a green-gold light that smells of apples.':'A black doorway sealed with a spiral. Three stones, each with a tree-letter, stand before it.',act:['Go in',()=>{
+   if(!F('ogDone'))return say('Sealed. A spiral glows on the lintel, but the Hill does not know you yet.');go('court',110)}]},
+ {id:'haw',n:'Hawthorn',b:[60,290,230,526],stand:250,look:'A lone hawthorn hung with rags and ribbons, tied by travellers for wishes. Cut one of these on the Hill and the Folk will not forget it.',quiet:true}
+],
+court:[
+ {id:'lady',n:'The Lady',b:[780,372,882,532],stand:740,look:'The Lady of the Hollow Hill. She is the colour of moonlit water and has been listening to every word you say.',act:['Speak',()=>{
+   if(!F('ladyMet')){setF('ladyMet');return T('l1')}
+   if(!F('trial3'))return T('l3');
+   if(!F('trial3done')){return has('whistle')?openWhistle('court'):say('You have no instrument. She waits.')}
+   if(!F('bargain'))return T('l7');
+   if(has('ember'))return T('lBye');
+   T('lWait')}],
+  use:{whistle:()=>{if(F('trial3')&&!F('trial3done'))openWhistle('court');else say('Piping at her unasked would be rude, and rudeness is a debt.')},
+       iron:()=>ironFail(),bread:()=>say('“Bread,” says the Lady. “How sweet. Guest-right is a two-way road, mortal. Keep that in mind.”')}},
+ {id:'guard',n:'Antlered guard',b:[1190,350,1290,540],stand:1130,look:()=>F('guardSleeps')?'The guard is asleep, antlers drooping, a leaf of light rising and falling with his breath.':'A guard with an antlered helm and a spear tipped in moonlight. He watches the Old Fire as only a thing that never tires can.',act:['Speak',()=>{
+   if(F('guardSleeps'))return say('He snores, softly, the way a mountain would.');
+   say('The guard turns his head. “The fire is the Lady’s. No one takes it unless she gives it, and she gives nothing.”')}],
+  use:{whistle:()=>{if(F('guardSleeps'))return say('He is already asleep.');openWhistle('guard')},iron:()=>ironFail()}},
+ {id:'pot',n:'Cauldron of the Old Fire',b:[1272,420,1412,548],stand:1190,look:'A cauldron older than the Hill, burning with the first fire ever kindled. Heat falls from it like honey.',use:{lantern:()=>{
+   if(F('guardSleeps')){
+     if(!F('bargain'))setF('thief');
+     take('lantern');give('ember');setF('ember');say(F('thief')?'The coal settles into the lantern. You have taken what was not given. The Lady, across the hall, is smiling.':'The coal settles into the lantern, blue-gold and warm as a promise. Carry it home.');
+   } else say('The guard’s spear lowers an inch, politely, between you and the cauldron.')}}},
+ {id:'table',n:'Feast table',b:[300,440,530,536],stand:270,look:'A feast laid for no one: roast boar, honeyed apples, wine that glows. You are suddenly ravenous. That, of course, is the point.',act:['Eat',()=>{
+   if(F('ate'))return say('You have eaten. There is nothing to be done about it now.');
+   setF('ate');hon(-2);say('It tastes like every happy day you ever had, and each mouthful leaves you hungrier. Behind you, the Lady laughs, very softly. You have broken a geas.')}]},
+ {id:'harp',n:'The harp',b:[686,214,774,310],stand:700,look:'The Dagda’s harp hung in the arch. It knows three strains: sleep, joy and sorrow. Whoever plays all three rules the seasons. Tonight, it hangs silent.',quiet:true},
+ {id:'exit',n:'Door to the Hill',b:[40,370,170,552],stand:190,look:'The way back to the world of mortals.',act:['Leave',()=>go('hill',930)]}
+]};
+function stone(i){S.stones[i]=S.stones[i]%4+1;tone(220+S.stones[i]*40+i*10,.5,'triangle',.14);
+ if(S.stones[0]===1&&S.stones[1]===2&&S.stones[2]===3&&!F('ogDone')){setF('ogDone');chime(true);say('Birch, Rowan, Alder. A hum rises from the earth and the spiral on the Hill’s door blazes up from white to gold. The way is open.')}}
+function ironFail(){setF('ironDrawn');say('You draw the iron nail. The hall goes absolutely silent. The music stops. The lights go out, one by one.');setTimeout(()=>showEnd('D'),2600)}
+const EXITS={village:{right:()=>go('shore',70)},shore:{left:()=>go('village',1230)},hill:{left:()=>{if(F('paid'))go('shore',770);}},court:{left:()=>go('hill',930)}};
+const STARTS={village:{x:430},shore:{x:70},hill:{x:70},court:{x:110}};
+
+/* ---------- ending ---------- */
+function finish(){
+ take('ember');setF('hearth');VAR.dawn=true;chime(true);build();
+ say('Orla kneels at the hearth. The coal slides out of the turnip and the old logs catch, and Brigid’s flame climbs, gold and steady, as the first grey of morning touches Dunmara.');
+ setTimeout(()=>{const thief=F('thief'),nm=F('bargain_name');let e='B';
+  if(thief||nm||S.hon<=0)e='C';else if(F('bargain_hearth')&&S.hon>=2)e='A';
+  showEnd(e)},4200)}
+const ENDS={
+ A:['The Hearth Kept','Best ending: guest-right','Dawn finds Dunmara awake before the cocks. Nan watches the flame as if it might change its mind, and it does not.|You stood in the Lady’s hall and gave nothing away, ate nothing, and offered the one thing a mortal can give the Folk that neither side can steal: a seat at your hearth. Each Samhain a place is laid for a guest from the Hill. Each Samhain something silver and quiet comes in from the cold, sits, and blesses the house.|Guest-right holds. The oldest law keeps both worlds in order.'],
+ B:['A Fair Price','Ending: the bargain paid','Dunmara is warm again, and Nan has stopped counting the days since the fire went out.|You paid the Lady what she asked, and she took it as a thing freely given. {PAY}|It was not the grandest bargain. But it was fair, and a fair bargain is the only kind the Folk respect.'],
+ C:['The Debt','Ending: a debt remains','The hearth catches, but the flame burns thin and slightly blue, and throws a second shadow on the wall.|{WHY}|The Folk are patient. Each Samhain a knock will come at the door, and someone will call a name. Perhaps next year you will know what to say.'],
+ D:['Iron in the Hall','Ending: the peace is broken','You drew cold iron in a hall of guest-right. The Hill spits you out onto the wet grass with the dawn already grey.|No one has a hearth in Dunmara that morning. Nan sits with her hands in her lap. The Lady has already forgotten your face, but the Hill never forgets an insult.|You can always rewind to before the mistake and try a gentler way.']};
+function showEnd(k){
+ const [h,sub,body]=ENDS[k];let t=body;
+ t=t.replace('{PAY}',F('bargain_song')?'Your song is hers now; you can still hum the tune, but never the words. Something happier lives in the hollow of it.':'A year from the far end of your life, where you will not miss it. Mostly.');
+ t=t.replace('{WHY}',F('thief')?'You took the fire without paying. The Folk have a word for that, and it is not a kind one.':F('bargain_name')?'The Lady holds your true name. She said she would not say it. She only said that.':'Small slips: a thank-you here, a bite there, a name too freely spoken. Each was a thread. The Lady kept them all.');
+ $('endT').textContent=h;$('endK').textContent=sub;$('endB').innerHTML=t.split('|').map(p=>'<p>'+p+'</p>').join('');
+ $('endR').hidden=k!=='D';$('end').hidden=false;S.f.ended=k;save()}
+
+/* ---------- engine ---------- */
+const cv=$('cv'),g=cv.getContext('2d');
+const KEY='hollowhill1',ICON={iron:'🔩',rowan:'🌿',flint:'🪨',candle:'🕯️',candleLit:'🕯️',bread:'🍞',lantern:'🎃',whistle:'🎶',hazel:'🌰',ember:'🎃'};
+const HIDE={horse:'gotIron',rowan:'gotRowan',flint:'gotFlint',candle:'gotCandle',hazel:'gotHazel'};
+const BOT={village:'#142a20',shore:'#0a121a',hill:'#0c1c22',court:'#104a50'};
+const TUNES=[{id:'sleep',n:'Sleep strain',p:[4,3,2,1]},{id:'joy',n:'Joy strain',p:[1,3,5,3]},{id:'sorrow',n:'Sorrow strain',p:[2,3,2,1]}];
+let VX=0,VY=0,W=300,H=500,dpr=1,k=1,offY=0,camX=0,layers=null,pend=null,started=false,muted=false,hintOn=true,transit=false,CP=null,wctx=null,seq=[],dlgNode=null,typeTimer=null,fullText='',tShown=0,tNow=0,lastTs=0,resizeT=0;
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify({sc:S.sc,f:S.f,inv:S.inv,lore:S.lore,hon:S.hon,stones:S.stones,px:S.px}))}catch(e){}}
+function loadSave(){try{const o=JSON.parse(localStorage.getItem(KEY)||'null');return o&&o.sc&&SC[o.sc]?o:null}catch(e){return null}}
+function wipe(){try{localStorage.removeItem(KEY)}catch(e){}}
+
+/* audio */
+let AC=null,mg=null,dr=[],plink=0;
+function aud(){if(AC)return AC;try{AC=new(window.AudioContext||window.webkitAudioContext)();mg=AC.createGain();mg.gain.value=muted?0:1;mg.connect(AC.destination);
+  dr=[1,1.5,2].map((m,i)=>{const o=AC.createOscillator(),gn=AC.createGain();o.type=i?'sine':'triangle';o.frequency.value=100*m;gn.gain.value=[.05,.03,.018][i];o.connect(gn);gn.connect(mg);o.start();return o});
+  const lf=AC.createOscillator(),lg=AC.createGain();lf.frequency.value=.12;lg.gain.value=.012;lf.connect(lg);lg.connect(dr[0].frequency);lf.start();
+  plink=setInterval(()=>{if(started&&!muted&&!document.hidden){const r=SC[S.sc].root;tone(r*[2,2.25,3,3.375,4,4.5][(Math.random()*6)|0],2.2,'sine',.035)}},4200)}catch(e){AC=null}return AC}
+function musicRoot(){if(!AC)return;const r=SC[S.sc].root/2;dr.forEach((o,i)=>o.frequency.setTargetAtTime(r*[1,1.5,2][i],AC.currentTime,1.2))}
+function tone(f,d,type,v){if(!AC||muted)return;try{const o=AC.createOscillator(),gn=AC.createGain(),n=AC.currentTime;o.type=type||'sine';o.frequency.value=f;gn.gain.setValueAtTime(0,n);gn.gain.linearRampToValueAtTime(v||.1,n+.03);gn.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(gn);gn.connect(mg);o.start(n);o.stop(n+d+.05)}catch(e){}}
+function chime(big){aud();[784,988,1175,big?1568:0].forEach((f,i)=>f&&setTimeout(()=>tone(f,.9,'sine',.08),i*110))}
+
+/* layout + layers */
+function calc(){const sc=SC[S.sc];k=Math.max(H*.82/600,W/sc.w);offY=600*k<=H?-H*.07:Math.max(H-600*k,Math.min(0,H*.62-536*k))}
+function mk(w,h,fn,cs){const c=document.createElement('canvas');c.width=Math.ceil(w*cs);c.height=Math.ceil(h*cs);const x=c.getContext('2d');x.scale(cs,cs);fn(x,w,h);return c}
+function build(){const sc=SC[S.sc];calc();const cs=Math.min(1.5,Math.max(.7,k*dpr)),bw=Math.ceil(sc.w*.45+W/k+40);layers={bw,back:mk(bw,600,sc.back,cs),main:mk(sc.w,600,sc.main,cs)}}
+function resize(){const r=cv.getBoundingClientRect();W=Math.max(200,r.width);H=Math.max(300,r.height);dpr=Math.min(2,window.devicePixelRatio||1);cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);calc()}
+addEventListener('resize',()=>{resize();clearTimeout(resizeT);resizeT=setTimeout(build,250)});
+
+/* ui bits */
+let toastT=0;
+function toast(s){const e=$('toast');e.textContent=s;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),2600)}
+function say(t){run({w:'',t})}
+function typeStart(){clearInterval(typeTimer);tShown=0;$('dt').textContent='';typeTimer=setInterval(()=>{tShown+=2;$('dt').textContent=fullText.slice(0,tShown);if(tShown>=fullText.length)typeDone()},16)}
+function typeDone(){clearInterval(typeTimer);typeTimer=null;$('dt').textContent=fullText;showChoices()}
+function run(node){if(typeof node==='string')node=DL[node];if(!node)return;dlgNode=node;closePop();$('dlg').hidden=false;$('dw').textContent=node.w||'';$('dw').hidden=!node.w;$('dc').innerHTML='';$('dh').hidden=true;fullText=node.t;
+  if(node.fx)node.fx();if(dlgNode!==node)return;typeStart()}
+function choices(){const n=dlgNode;return n&&n.ch?n.ch.filter(c=>!c.if||c.if()):[]}
+function showChoices(){const n=dlgNode;if(!n)return;const cs=choices();const box=$('dc');box.innerHTML='';
+  if(cs.length){cs.forEach(c=>{const b=document.createElement('button');b.textContent=c.t;b.onclick=ev=>{ev.stopPropagation();pick(c)};box.appendChild(b)});$('dh').hidden=true}else $('dh').hidden=false}
+function pick(c){$('dc').innerHTML='';if(c.fx)c.fx();if(c.n==null)return closeDlg();run(typeof c.n==='string'?DL[c.n]:c.n)}
+function closeDlg(){dlgNode=null;clearInterval(typeTimer);$('dlg').hidden=true}
+$('dlg').addEventListener('click',()=>{if(!dlgNode)return;if(typeTimer)return typeDone();if(choices().length)return;
+  const n=dlgNode;if(n.n){run(typeof n.n==='string'?DL[n.n]:n.n)}else{closeDlg();if(n.end)n.end()}});
+DL.intro={w:'',t:'Samhain Eve. The cattle are in, the doors are barred, and in Dunmara the great hearth has gone cold. Nan Bríd is waiting by her door. She has been waiting for you.'};
+DL.fiGo.end=()=>{S.f.crossing=true;S.boatX=880;setTimeout(()=>{go('hill',70)},1000);setTimeout(()=>{S.f.crossing=false},1700)};
+
+function renderInv(){const b=$('inv');b.innerHTML='';S.inv.forEach(id=>{const e=document.createElement('button');e.className='it'+(S.sel===id?' on':'')+(id==='candleLit'||id==='ember'?' lit':'');e.textContent=ICON[id];e.setAttribute('aria-label',ITEMS[id].n);
+  e.onclick=ev=>{ev.stopPropagation();if(dlgNode||transit)return;closePop();if(S.sel&&S.sel!==id){const a=S.sel;S.sel=null;renderInv();selChip();return combine(a,id)}S.sel=S.sel===id?null:id;renderInv();selChip()};b.appendChild(e)});
+  b.classList.toggle('empty',!S.inv.length);if(S.sel&&!has(S.sel))S.sel=null;selChip()}
+function selChip(){const c=$('sel');if(!S.sel){c.hidden=true;return}const it=ITEMS[S.sel];c.hidden=false;$('selN').textContent=it.n;$('selD').textContent=it.d+' Tap something in the world to use it, or tap another item to combine.';$('selP').hidden=S.sel!=='whistle'}
+$('selX').onclick=()=>{S.sel=null;renderInv()};
+$('selP').onclick=()=>{aud();openWhistle('free')};
+
+/* popup */
+function closePop(){$('pop').hidden=true}
+function popAt(h,x,y){const p=$('pop');p.innerHTML='';const t=document.createElement('div');t.className='pn';t.textContent=h.n;p.appendChild(t);
+  const row=document.createElement('div');row.className='pr';const L=document.createElement('button');L.textContent='👁 Look';L.onclick=ev=>{ev.stopPropagation();closePop();const r=typeof h.look==='function'?h.look():h.look;if(r)say(r)};row.appendChild(L);
+  if(h.act){const A=document.createElement('button');A.textContent='✋ '+h.act[0];A.onclick=ev=>{ev.stopPropagation();closePop();walkTo(h.stand,540+((h.b[3]-540)*0),{h,verb:1})};row.appendChild(A)}
+  p.appendChild(row);p.hidden=false;const pw=p.offsetWidth;p.style.left=Math.max(8,Math.min(W-pw-8,x-pw/2))+'px';p.style.top=Math.max(60,y-p.offsetHeight-14)+'px'}
+
+/* input */
+const blocked=()=>!started||transit||dlgNode||wctx||!$('jr').hidden||!$('end').hidden||!$('title').hidden;
+function hit(sx,sy){const L=HS[S.sc];for(let i=L.length-1;i>=0;i--){const h=L[i],b=h.b;if(sx>=b[0]-8&&sx<=b[2]+8&&sy>=b[1]-8&&sy<=b[3]+8)return h}return null}
+cv.addEventListener('pointerdown',e=>{if(blocked())return;aud();const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,sx=(px+camX)/k,sy=(py-offY)/k;closePop();
+  const h=hit(sx,sy);
+  if(h){if(S.sel){const it=S.sel;walkTo(h.stand,540,{h,item:it});return}popAt(h,px,py-8);return}
+  pend=null;walkTo(sx,sy)});
+function walkTo(x,y,p){const sc=SC[S.sc];S.tx=Math.max(24,Math.min(sc.w-24,x));S.ty=Math.max(sc.y0,Math.min(sc.y1,y>sc.y1+30?sc.y1:y));pend=p||null}
+function arrive(){if(!pend)return;const p=pend;pend=null;const b=p.h.b;S.face=(b[0]+b[2])/2>=S.px?1:-1;
+  if(p.item){const it=p.item;S.sel=null;renderInv();const f=p.h.use&&p.h.use[it];if(f)f();else fail()}else p.h.act[1]()}
+function go(sc,x){if(transit)return;transit=true;closePop();pend=null;S.tx=null;$('fade').style.opacity=1;
+  setTimeout(()=>{S.sc=sc;S.px=x;S.py=540;S.tx=null;S.moving=false;S.face=x<SC[sc].w/2?1:-1;build();const c=S.px*k-W/2,mx=SC[sc].w*k-W;camX=mx>0?Math.max(0,Math.min(mx,c)):mx/2;
+    if(sc==='court')CP=JSON.stringify({sc:S.sc,f:S.f,inv:S.inv,lore:S.lore,hon:S.hon,stones:S.stones});musicRoot();$('loc').textContent=SC[sc].name;$('fade').style.opacity=0;transit=false;save();toast(SC[sc].name)},950)}
+
+/* whistle */
+function openWhistle(ctx){wctx=ctx;seq=[];closeDlg();closePop();$('wh').hidden=false;
+  $('whT').textContent={court:'Play for the court of the Lady.',puca:'Play for the púca.',guard:'Play for the guard.',free:'Play the tin whistle.'}[ctx];
+  $('whK').innerHTML=TUNES.filter(t=>lored(t.id)).map(t=>'<span>'+t.n+': '+t.p.join(' · ')+'</span>').join('')||'<span>You do not know any tunes yet.</span>';drawSeq()}
+function drawSeq(){$('whD').innerHTML=[0,1,2,3].map(i=>'<i class="'+(seq[i]?'on':'')+'">'+(seq[i]||'')+'</i>').join('')}
+function note(n){aud();tone([392,440,523,587,659][n-1],.7,'triangle',.18);seq.push(n);if(seq.length>4)seq.shift();drawSeq();
+  const m=TUNES.find(t=>seq.length===4&&t.p.every((v,i)=>v===seq[i]));if(m){const c=wctx;setTimeout(()=>{closeWh();resolve(m.id,c)},550)}else if(seq.length===4){$('whD').classList.add('no');setTimeout(()=>$('whD').classList.remove('no'),400)}}
+function closeWh(){wctx=null;$('wh').hidden=true}
+function resolve(id,c){
+ if(c==='court')return T({sorrow:'lSorrow',joy:'lJoy',sleep:'lSleep'}[id]);
+ if(c==='puca'){if(id==='joy')return T('puJoy');return say(id==='sleep'?'The púca yawns hugely, then shakes himself. “Not for me, pretty one.”':'The púca sniffles theatrically, then tells you a very sad lie.')}
+ if(c==='guard'){if(id==='sleep'){setF('guardSleeps');return say('The guard’s eyelids sink. He kneels, then settles on his side, the spear falling softly onto the moss. He sleeps like a mountain.')}
+   return say(id==='joy'?'The guard taps one foot, catches himself, and glares.':'A single tear slides down the guard’s cheek. He remains perfectly awake.')}
+ say('You play the '+TUNES.find(t=>t.id===id).n+'. It is a tune that wants a listener.')}
+document.querySelectorAll('#whB button').forEach(b=>b.onclick=()=>note(+b.dataset.n));
+$('whX').onclick=closeWh;
+
+/* journal */
+function openJ(){aud();$('bJ').classList.remove('pulse');const h=S.hon>=2?'Unblemished':S.hon===1?'Slightly frayed':'Entangled';
+  $('jrB').innerHTML='<h3>What now</h3><p>'+goalText()+'</p><h3>Standing with the Folk</h3><p>'+'◆'.repeat(Math.max(0,Math.min(3,S.hon)))+'◇'.repeat(3-Math.max(0,Math.min(3,S.hon)))+' '+h+'. Thanks, food and true names are all debts.</p><h3>What you have learned</h3>'+
+  (S.lore.length?S.lore.map(id=>'<div class="lo"><b>'+LORE[id][0]+'</b><span>'+LORE[id][1]+'</span></div>').join(''):'<p>Nothing yet. Listen to the old ones.</p>');$('jr').hidden=false}
+$('bJ').onclick=openJ;$('jrX').onclick=()=>$('jr').hidden=true;
+$('bS').onclick=()=>{muted=!muted;aud();if(mg)mg.gain.value=muted?0:1;$('bS').textContent=muted?'🔇':'🔊'};
+$('bH').onclick=()=>{hintOn=!hintOn;$('bH').classList.toggle('off',!hintOn)};
+
+/* new game / continue */
+function reset(){Object.assign(S,{sc:'village',f:{},inv:[],lore:[],hon:2,stones:[4,4,4],px:430,py:540,face:1,boatX:880,sel:null,tx:null,moving:false});VAR.dawn=false;pend=null}
+function enter(){started=true;$('title').hidden=true;$('end').hidden=true;$('hud').hidden=false;$('loc').textContent=SC[S.sc].name;S.f.crossing=false;S.tx=null;build();camX=Math.max(0,Math.min(SC[S.sc].w*k-W,S.px*k-W/2));renderInv();musicRoot()}
+$('bNew').onclick=()=>{aud();wipe();reset();enter();run(DL.intro)};
+$('bCont').onclick=()=>{aud();const o=loadSave();reset();Object.assign(S,o);S.sel=null;VAR.dawn=F('hearth');S.py=540;enter();if(S.sc==='court')CP=JSON.stringify({sc:S.sc,f:S.f,inv:S.inv,lore:S.lore,hon:S.hon,stones:S.stones})};
+$('endN').onclick=()=>{wipe();reset();$('end').hidden=true;$('title').hidden=false;$('bCont').hidden=true;build()};
+$('endR').onclick=()=>{if(!CP)return;const o=JSON.parse(CP);delete o.f.ironDrawn;Object.assign(S,o,{px:110,py:540,tx:null});S.sel=null;$('end').hidden=true;build();renderInv();$('loc').textContent=SC[S.sc].name;save()};
+
+/* update + render */
+function update(dt){
+ if(S.f.crossing&&S.sc==='shore'){S.boatX+=dt*190;S.px=S.boatX-40;S.py=480;S.moving=false}
+ else if(S.tx!=null){const sc=SC[S.sc],dx=S.tx-S.px,dy=S.ty-S.py,d=Math.hypot(dx,dy),want=Math.min(215,d*3.2+14),a=Math.min(1,dt*6);
+  VX+=((dx/(d||1))*want-VX)*a;VY+=((dy/(d||1))*want*.6-VY)*a;
+  if(d<=2.5){S.px=S.tx;S.py=S.ty;S.tx=null;S.moving=false;VX=VY=0;arrive()}else{S.px+=VX*dt;S.py+=VY*dt;S.moving=true;if(Math.abs(dx)>2)S.face=dx>0?1:-1}
+  const ex=EXITS[S.sc];if(ex&&S.moving&&!transit){if(S.px<=26&&ex.left&&dx<0)ex.left();else if(S.px>=sc.w-26&&ex.right&&dx>0)ex.right()}}
+ else{S.moving=false;VX*=.8}
+ const sc=SC[S.sc],tgt=(S.px+S.face*70)*k-W/2,mx=sc.w*k-W,want=mx>0?Math.max(0,Math.min(mx,tgt)):mx/2;camX+=(want-camX)*Math.min(1,dt*2.4)}
+function fl(x,y,ph,t,lean,fn){g.save();g.translate(x,y);g.rotate(Math.sin(t*1.1+ph)*.014+lean);g.scale(1,1+Math.sin(t*1.7+ph)*.007);g.translate(0,Math.sin(t*1.5+ph)*-1.6);g.translate(-x,-y);fn();g.restore()}
+function ents(t){const L=[],s=S.sc,sleeping=F('guardSleeps');
+ if(s==='village'){L.push([512,()=>fl(330,512,1,t,0,()=>drawPerson(g,'nan',330,512,t,1,false))],[524,()=>fl(880,524,2,t,0,()=>drawPerson(g,'dara',880,524,t,-1,false))])}
+ if(s==='shore')L.push([540,()=>hound(g,560,542,t,-1,false,true)]);
+ if(s==='hill')L.push([534,()=>puca(g,290,534,t,F('pucaTruth'))]);
+ if(s==='court'){L.push([526,()=>fl(830,526,3,t*.8,0,()=>{g.translate(0,Math.sin(t*.9)*-4);drawPerson(g,'lady',830,526,t,-1,false)})],[534,()=>{if(sleeping){g.save();g.translate(1250,540);g.rotate(-1.45);g.translate(-1250,-540);drawPerson(g,'guard',1250,540,t,-1,false);g.restore();g.fillStyle='rgba(230,240,255,'+(.5+.4*Math.sin(t*2))+')';g.font='italic 700 22px Georgia';g.fillText('z',1196,470-Math.sin(t)*4);g.font='italic 700 16px Georgia';g.fillText('z',1214,448-Math.sin(t+1)*4)}else fl(1240,534,4,t,0,()=>drawPerson(g,'guard',1240,534,t,-1,false))}])}
+ L.push([S.py,()=>{if(S.f.crossing&&s==='shore')drawPerson(g,'orla',S.px,S.py,t,1,false);else fl(S.px,S.py,0,t,Math.max(-.07,Math.min(.07,VX/215*.07)),()=>drawPerson(g,'orla',S.px,S.py,t,S.face,S.moving))}]);
+ L.sort((a,b)=>a[0]-b[0]);return L}
+const GR={village:'#4f8a5a',shore:'#3c6a7a',hill:'#4aa888',court:'#9af0d0'};
+const MOTE={village:'#ffd8a0',shore:'#bfe8ff',hill:'#a8ffd0',court:'#fff6b0'};
+function ambient(g,t,sc){const w=sc.w;
+ g.save();g.globalCompositeOperation='lighter';
+ for(let i=0;i<46;i++){const R=mulb(i*7+3),x=(R()*w+Math.sin(t*.25+i)*40+t*(3+R()*5))%w,y=300+R()*280+Math.sin(t*.5+i*1.7)*22,r=1.6+R()*2.4,a=.25+.35*Math.sin(t*1.4+i*2.1)**2;
+  const gr=g.createRadialGradient(x,y,0,x,y,r*5);gr.addColorStop(0,hexA(MOTE[S.sc],a));gr.addColorStop(1,hexA(MOTE[S.sc],0));g.fillStyle=gr;g.beginPath();g.arc(x,y,r*5,0,TAU);g.fill()}
+ const hg=g.createRadialGradient(S.px,S.py-50,4,S.px,S.py-50,120);hg.addColorStop(0,'rgba(255,225,170,.16)');hg.addColorStop(1,'rgba(255,225,170,0)');g.fillStyle=hg;g.fillRect(S.px-130,S.py-180,260,260);
+ g.restore();
+ for(let k2=0;k2<2;k2++)cloudBand(g,((t*(14+k2*9)+k2*600)%(w+900))-450,548+k2*22,520,16,'#cfe0ff');
+ const n=Math.round(w/8);g.lineCap='round';
+ for(let i=0;i<n;i++){const R=mulb(i+500),x=i*8+R()*8,by=578+R()*24,h=16+R()*26,sw=Math.sin(t*1.2+x*.012+R()*3)*9+Math.sin(t*.5+i)*3;
+  g.strokeStyle=hexA(GR[S.sc],.35+R()*.3);g.lineWidth=1.6;g.beginPath();g.moveTo(x,by);g.quadraticCurveTo(x+sw*.4,by-h*.6,x+sw,by-h);g.stroke()}}
+function render(t){const sc=SC[S.sc];g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle=BOT[S.sc];g.fillRect(0,0,W,H);if(!layers)return;
+ g.drawImage(layers.back,-camX*.45+Math.sin(t*.07)*8,offY+Math.sin(t*.11)*3,layers.bw*k,600*k);g.drawImage(layers.main,-camX,offY,sc.w*k,600*k);
+ g.setTransform(dpr*k,0,0,dpr*k,-camX*dpr,offY*dpr);
+ ents(t).forEach(e=>e[1]());sc.dyn(g,t,camX/k,S);ambient(g,t,sc);
+ if(hintOn&&!transit&&!dlgNode)HS[S.sc].forEach(h=>{if(h.quiet||(HIDE[h.id]&&F(HIDE[h.id]))||(h.id==='exit'))return;if(h.id==='lady'&&F('bargain'))return;const x=(h.b[0]+h.b[2])/2,y=h.b[1]+(h.b[3]-h.b[1])*.3,p=(t*.8+x*.01)%1;g.strokeStyle='rgba(255,236,170,'+(.65*(1-p))+')';g.lineWidth=2;g.beginPath();g.arc(x,y,6+p*16,0,TAU);g.stroke();g.fillStyle='rgba(255,240,190,.85)';g.beginPath();g.arc(x,y,3,0,TAU);g.fill()});
+ EXITS[S.sc]&&['left','right'].forEach(side=>{if(!EXITS[S.sc][side])return;const x=side==='left'?22:sc.w-22,a=.35+.25*Math.sin(t*3);g.fillStyle='rgba(255,236,170,'+a+')';g.beginPath();if(side==='left'){g.moveTo(x+8,545);g.lineTo(x-6,553);g.lineTo(x+8,561)}else{g.moveTo(x-8,545);g.lineTo(x+6,553);g.lineTo(x-8,561)}g.fill()});
+ g.setTransform(dpr,0,0,dpr,0,0);const vg=g.createRadialGradient(W/2,H*.45,Math.min(W,H)*.3,W/2,H*.5,Math.max(W,H)*.75);vg.addColorStop(0,'rgba(0,0,10,0)');vg.addColorStop(1,'rgba(0,0,12,.5)');g.fillStyle=vg;g.fillRect(0,0,W,H)}
+function frame(ts){requestAnimationFrame(frame);const dt=Math.min(.05,(ts-lastTs)/1000||0);lastTs=ts;tNow+=dt;if(started&&!transit)update(dt);else if(!started)camX=Math.max(0,Math.min(SC[S.sc].w*k-W,(S.px+Math.sin(tNow*.1)*60)*k-W/2));render(tNow)}
+
+/* boot */
+resize();(function(){const o=loadSave();if(o&&!o.f.ended&&!o.f.hearth){$('bCont').hidden=false}})();
+build();requestAnimationFrame(frame);
+if(/hotest/.test(location.search)){window.__hh={S,HS,DL,go,run,F,has,note,T,
+ act:id=>{const h=HS[S.sc].find(x=>x.id===id);S.px=h.stand;S.tx=null;S.face=1;if(!h.act)throw new Error('no act '+id);h.act[1]()},
+ use:(id,item)=>{const h=HS[S.sc].find(x=>x.id===id);S.px=h.stand;S.tx=null;const f=h.use&&h.use[item];if(f)f();else fail()},
+ look:id=>{const h=HS[S.sc].find(x=>x.id===id);const r=typeof h.look==='function'?h.look():h.look;if(r)say(r)},
+ adv:()=>$('dlg').click(),choose:i=>{const b=$('dc').querySelectorAll('button');b[i].click()},fast:()=>{if(typeTimer)typeDone()},
+ open:()=>!$('dlg').hidden,resolve,combine,finish,start:()=>$('bNew').click(),walkTo,tone}}
+})();</script>
+
+</body>
+</html>
